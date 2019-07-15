@@ -1,17 +1,23 @@
-import { Container, Text } from 'pixi.js'
-import Circle from './../graphics/circle'
+import { Container, Text, Graphics } from 'pixi.js'
 
 class Player extends Container {
     constructor(playerName, teamId) {
         super();
 
-        this._circle = new Circle(0xFFFFFF, 70);
-        this.addChild(this._circle);
+        let backgroundCircle = new Graphics();
+        backgroundCircle.beginFill(0xFFFFFF);
+        backgroundCircle.drawCircle(0, 0, this.size);
+        backgroundCircle.endFill();
+        this.addChild(backgroundCircle);
 
-        this._text = new Text(String(teamId), { fontSize: 100 });
-        this._text.anchor.x = 0.5;
-        this._text.anchor.y = 0.5;
-        this.addChild(this._text);
+        let text = new Text(String(teamId), { fontSize: 100 });
+        text.anchor.set(0.5, 0.5);
+
+        this.addChild(text);
+    }
+
+    get size() {
+        return 70;
     }
 }
 
