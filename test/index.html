@@ -3,15 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-
 </head>
 <body>
 
 <script src="../dist/bundle.js"></script>
+
 <script>
-    const replayer = new Replay.Minimap();
-    document.body.appendChild(replayer.app.view);
+    function onDataLoad(data) {
+        const replayer = new Replay.Minimap(data);
+
+        document.body.appendChild(replayer.app.view);
+        console.log(data);
+
+//        replayer.seek(100);
+    }
 </script>
+<script src="./data.jsonp.js"></script>
 
 </body>
 </html>

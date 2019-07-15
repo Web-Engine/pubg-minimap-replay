@@ -1,10 +1,10 @@
-import * as PIXI from 'pixi.js';
+import { Application } from 'pixi.js';
 
 class Minimap {
     constructor(data) {
         this.data = data;
 
-        this.app = new PIXI.Application({
+        this.app = new Application({
             width: 800,
             height: 800,
         });
