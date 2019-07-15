@@ -8,7 +8,7 @@ class Player extends Container {
         this._circle = new Circle(0xFFFFFF, 70);
         this.addChild(this._circle);
 
-        this._text = new Text(String(teamId), { fontFamily: 'Arial', fill: 0, fontSize: 100 });
+        this._text = new Text(String(teamId), { fontSize: 100 });
         this._text.anchor.x = 0.5;
         this._text.anchor.y = 0.5;
         this.addChild(this._text);
