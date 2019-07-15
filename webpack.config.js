@@ -11,16 +11,28 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.png$/,
+                include: [
+                    path.resolve(__dirname, 'src'),
+                ],
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                    },
+                ],
+            },
+            {
                 test: /\.js$/,
                 include: [
-                    path.resolve(__dirname, 'src')
+                    path.resolve(__dirname, 'src'),
                 ],
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: ['@babel/preset-env'],
-                        plugins: ['@babel/plugin-proposal-class-properties']
+                        plugins: ['@babel/plugin-proposal-class-properties'],
                     },
                 },
             },

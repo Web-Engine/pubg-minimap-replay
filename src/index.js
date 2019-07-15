@@ -25,6 +25,8 @@ function binarySearch(array, value)
     return right;
 }
 
+import SanhokBackground from './assets/Sanhok_Main_High_Res.png';
+
 class Minimap {
     constructor(data) {
         this.data = data;
@@ -44,7 +46,7 @@ class Minimap {
 
         this.app.stage.transform.scale.set(0.1, 0.1);
 
-        const backgroundTexture = Texture.from('./Sanhok_Main_High_Res.png');
+        const backgroundTexture = Texture.from(SanhokBackground);
         const background = new Sprite(backgroundTexture);
         this.app.stage.addChild(background);
 
@@ -94,7 +96,6 @@ class Minimap {
 
                 players[accountId].x *=  8192 / 400000;
                 players[accountId].y *=  8192 / 400000;
-                // console.log('Hello');
             }
 
             this.currentTime += delta * window.speed;
