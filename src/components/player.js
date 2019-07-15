@@ -6,18 +6,14 @@ class Player extends Container {
 
         let backgroundCircle = new Graphics();
         backgroundCircle.beginFill(0xFFFFFF);
-        backgroundCircle.drawCircle(0, 0, this.size);
+        backgroundCircle.drawCircle(0, 0, 20);
         backgroundCircle.endFill();
         this.addChild(backgroundCircle);
 
-        let text = new Text(String(teamId), { fontSize: 100 });
+        let text = new Text(String(teamId), { fontSize: 20 });
         text.anchor.set(0.5, 0.5);
 
         this.addChild(text);
-    }
-
-    get size() {
-        return 70;
     }
 }
 
