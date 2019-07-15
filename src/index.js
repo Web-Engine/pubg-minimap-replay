@@ -1,5 +1,8 @@
 import { Application, Texture, Sprite } from 'pixi.js';
 import Player from './components/player'
+import WhiteCircle from './components/whiteCircle';
+import RedZone from './components/redZone';
+import SafetyZone from './components/safetyZone';
 
 function binarySearch(array, value)
 {
@@ -42,9 +45,9 @@ class Minimap {
             antialias: true
         });
 
-        this.app.stage.transform.scale.set(0.1, 0.1);
+        this.app.stage.transform.scale.set(819/1000, 819/1000);
 
-        const backgroundTexture = Texture.from('./Sanhok_Main_High_Res.png');
+        const backgroundTexture = Texture.from('./Sanhok_Main_Low_Res.png');
         const background = new Sprite(backgroundTexture);
         this.app.stage.addChild(background);
 
@@ -52,17 +55,19 @@ class Minimap {
 
         let characters = {};
         for (let position of positions) {
-            if (!characters[position.character.accountId]) {
-                characters[position.character.accountId] = [];
+            let accountId = position.character.accountId;
+
+            if (!characters[accountId]) {
+                characters[accountId] = [];
             }
 
-            characters[position.character.accountId].push(position);
+            characters[accountId].push(position);
         }
 
         let players = {};
         for (let accountId in characters) {
             let character = characters[accountId][0].character;
-            let player = new Player(character.playerName, character.teamId);
+            let player = new Player(character.name, character.teamId);
 
             players[character.accountId] = player;
             this.app.stage.addChild(player);
@@ -92,11 +97,93 @@ class Minimap {
                     players[accountId].y = positions[index].y * (1 - ratio) + positions[index + 1].y * ratio;
                 }
 
-                players[accountId].x *=  8192 / 400000;
-                players[accountId].y *=  8192 / 400000;
+                players[accountId].x *=  1000 / 400000;
+                players[accountId].y *=  1000 / 400000;
                 // console.log('Hello');
             }
+        });
 
+        let gameStates = data.filter(log => log._T === 'LogGameStatePeriodic');
+        let position = { x: 0, y: 0 };
+        let radius = 0;
+
+        let whiteCircle = new WhiteCircle(position.x, position.y, radius);
+        this.app.stage.addChild(whiteCircle);
+
+        this.app.ticker.add(delta => {
+            let index = gameStates.findIndex(log => log._elapsedTime > this.currentTime);
+
+            if (index === -1) return;
+            if (index === 0) return;
+
+            whiteCircle.position.x = gameStates[index - 1].gameState.poisonGasWarningPosition.x * 1000 / 400000;
+            whiteCircle.position.y = gameStates[index - 1].gameState.poisonGasWarningPosition.y * 1000 / 400000;
+            whiteCircle.resizeCircle(gameStates[index - 1].gameState.poisonGasWarningRadius * 1000 / 400000);
+        });
+
+        let redZone = new RedZone(position.x, position.y, radius);
+        this.app.stage.addChild(redZone);
+
+        this.app.ticker.add(delta => {
+            let index = gameStates.findIndex(log => log._elapsedTime > this.currentTime);
+
+            if (index === -1) return;
+            if (index === 0) return;
+
+            redZone.position.x = gameStates[index - 1].gameState.redZonePosition.x * 1000 / 400000;
+            redZone.position.y = gameStates[index - 1].gameState.redZonePosition.y * 1000 / 400000;
+            redZone.resizeCircle(gameStates[index - 1].gameState.redZoneRadius * 1000 / 400000);
+        });
+
+        let safetyZone = new SafetyZone(gameStates[0].gameState.safetyZonePosition.x, gameStates[0].gameState.safetyZonePosition.y,gameStates[0].gameState.safetyZoneRadius);
+        this.app.stage.addChild(safetyZone);
+        console.log(gameStates);
+
+        this.app.ticker.add(delta => {
+            let i;
+            for (i = 0; i < gameStates.length; i++)
+            {
+                let log = gameStates[i];
+                if (log._elapsedTime > this.currentTime) break;
+            }
+
+            if (i === gameStates.length)
+            {
+                position = gameStates[gameStates.length - 1].gameState.safetyZonePosition;
+                radius = gameStates[gameStates.length - 1].gameState.safetyZoneRadius;
+            }
+
+            else if (i !== 0)
+            {
+                let before = gameStates[i - 1];
+                let after = gameStates[i];
+
+                let diffTime = after._elapsedTime - before._elapsedTime;
+                let ratio = (this.currentTime - before._elapsedTime) / diffTime;
+
+                let beforeState = before.gameState;
+                let afterState = after.gameState;
+
+                let beforePosition = beforeState.safetyZonePosition;
+                let afterPosition = afterState.safetyZonePosition;
+
+                let beforeRadius = beforeState.safetyZoneRadius;
+                let afterRadius = afterState.safetyZoneRadius;
+
+                position = {
+                    x: beforePosition.x * (1 - ratio) + afterPosition.x * ratio,
+                    y: beforePosition.y * (1 - ratio) + afterPosition.y * ratio,
+                };
+
+                radius = beforeRadius * (1 - ratio) + afterRadius * ratio;
+            }
+
+            safetyZone.position.x = position.x * 1000 / 400000;
+            safetyZone.position.y = position.y * 1000 / 400000;
+            safetyZone.resizeCircle(radius * 1000 / 400000);
+        });
+
+        this.app.ticker.add(delta => {
             this.currentTime += delta * window.speed;
         });
     }
