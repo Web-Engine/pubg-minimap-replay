@@ -10,12 +10,11 @@
 
 <script>
     function onDataLoad(data) {
-        const replayer = new Replay.Minimap(data);
+        window.data = data;
+
+        replayer = new Replay.Minimap(data);
 
         document.body.appendChild(replayer.app.view);
-        console.log(data);
-
-//        replayer.seek(100);
     }
 </script>
 <script src="./data.jsonp.js"></script>

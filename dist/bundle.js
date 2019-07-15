@@ -39691,7 +39691,7 @@ module.exports = function parseURI (str, opts) {
 /*!*********************************************!*\
   !*** ./node_modules/pixi.js/lib/pixi.es.js ***!
   \*********************************************/
-/*! exports provided: accessibility, extract, interaction, prepare, utils, VERSION, filters, useDeprecated, Application, AbstractRenderer, Attribute, BaseRenderTexture, BaseTexture, BatchDrawCall, BatchGeometry, BatchRenderer, Buffer, CubeTexture, Filter, Framebuffer, GLProgram, GLTexture, Geometry, ObjectRenderer, Program, Quad, QuadUv, RenderTexture, Renderer, Shader, SpriteMaskFilter, State, System, Texture, TextureMatrix, TextureUvs, UniformGroup, autoDetectRenderer, checkMaxIfStatementsInShader, defaultFilterVertex, defaultVertex, generateMultiTextureShader, resources, systems, AppLoaderPlugin, Loader, LoaderResource, TextureLoader, ParticleContainer, ParticleRenderer, Spritesheet, SpritesheetLoader, TilingSprite, TilingSpriteRenderer, BitmapFontLoader, BitmapText, Ticker, TickerPlugin, UPDATE_PRIORITY, BLEND_MODES, DRAW_MODES, ENV, FORMATS, GC_MODES, MIPMAP_MODES, PRECISION, RENDERER_TYPE, SCALE_MODES, TARGETS, TYPES, WRAP_MODES, Bounds, Container, DisplayObject, FillStyle, GRAPHICS_CURVES, Graphics, GraphicsData, GraphicsGeometry, LineStyle, Circle, DEG_TO_RAD, Ellipse, GroupD8, Matrix, ObservablePoint, PI_2, Point, Polygon, RAD_TO_DEG, Rectangle, RoundedRectangle, SHAPES, Transform, Mesh, MeshBatchUvs, MeshGeometry, MeshMaterial, NineSlicePlane, PlaneGeometry, RopeGeometry, SimpleMesh, SimplePlane, SimpleRope, Runner, Sprite, AnimatedSprite, TEXT_GRADIENT, Text, TextMetrics, TextStyle, isMobile, settings */
+/*! exports provided: accessibility, extract, interaction, prepare, utils, Application, AbstractRenderer, Attribute, BaseRenderTexture, BaseTexture, BatchDrawCall, BatchGeometry, BatchRenderer, Buffer, CubeTexture, Filter, Framebuffer, GLProgram, GLTexture, Geometry, ObjectRenderer, Program, Quad, QuadUv, RenderTexture, Renderer, Shader, SpriteMaskFilter, State, System, Texture, TextureMatrix, TextureUvs, UniformGroup, autoDetectRenderer, checkMaxIfStatementsInShader, defaultFilterVertex, defaultVertex, generateMultiTextureShader, resources, systems, AppLoaderPlugin, Loader, LoaderResource, TextureLoader, ParticleContainer, ParticleRenderer, Spritesheet, SpritesheetLoader, TilingSprite, TilingSpriteRenderer, BitmapFontLoader, BitmapText, Ticker, TickerPlugin, UPDATE_PRIORITY, BLEND_MODES, DRAW_MODES, ENV, FORMATS, GC_MODES, MIPMAP_MODES, PRECISION, RENDERER_TYPE, SCALE_MODES, TARGETS, TYPES, WRAP_MODES, Bounds, Container, DisplayObject, FillStyle, GRAPHICS_CURVES, Graphics, GraphicsData, GraphicsGeometry, LineStyle, Circle, DEG_TO_RAD, Ellipse, GroupD8, Matrix, ObservablePoint, PI_2, Point, Polygon, RAD_TO_DEG, Rectangle, RoundedRectangle, SHAPES, Transform, Mesh, MeshBatchUvs, MeshGeometry, MeshMaterial, NineSlicePlane, PlaneGeometry, RopeGeometry, SimpleMesh, SimplePlane, SimpleRope, Runner, Sprite, AnimatedSprite, TEXT_GRADIENT, Text, TextMetrics, TextStyle, isMobile, settings, VERSION, filters, useDeprecated */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45649,6 +45649,123 @@ module.exports = function(module) {
 
 /***/ }),
 
+/***/ "./src/components/player.js":
+/*!**********************************!*\
+  !*** ./src/components/player.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
+/* harmony import */ var _graphics_circle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../graphics/circle */ "./src/graphics/circle.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+
+var Player =
+/*#__PURE__*/
+function (_Container) {
+  _inherits(Player, _Container);
+
+  function Player(playerName, teamId) {
+    var _this;
+
+    _classCallCheck(this, Player);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Player).call(this));
+    _this._circle = new _graphics_circle__WEBPACK_IMPORTED_MODULE_1__["default"](0xFFFFFF, 70);
+
+    _this.addChild(_this._circle);
+
+    _this._text = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Text"](String(teamId), {
+      fontFamily: 'Arial',
+      fill: 0,
+      fontSize: 100
+    });
+    _this._text.anchor.x = 0.5;
+    _this._text.anchor.y = 0.5;
+
+    _this.addChild(_this._text);
+
+    return _this;
+  }
+
+  return Player;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_0__["Container"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Player);
+
+/***/ }),
+
+/***/ "./src/graphics/circle.js":
+/*!********************************!*\
+  !*** ./src/graphics/circle.js ***!
+  \********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+
+
+var Circle =
+/*#__PURE__*/
+function (_Graphics) {
+  _inherits(Circle, _Graphics);
+
+  function Circle(color, radius) {
+    var _this;
+
+    _classCallCheck(this, Circle);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Circle).call(this));
+
+    _this.beginFill(color);
+
+    _this.drawCircle(0, 0, radius);
+
+    _this.endFill();
+
+    return _this;
+  }
+
+  return Circle;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_0__["Graphics"]);
+
+/* harmony default export */ __webpack_exports__["default"] = (Circle);
+
+/***/ }),
+
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
@@ -45660,20 +45777,151 @@ module.exports = function(module) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Minimap", function() { return Minimap; });
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/pixi.es.js");
+/* harmony import */ var _components_player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/player */ "./src/components/player.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 
 
+
+function binarySearch(array, value) {
+  var left = 0;
+  var right = array.length;
+
+  while (left <= right) {
+    var mid = Math.floor((left + right) / 2);
+
+    if (array[mid] === value) {
+      return mid;
+    }
+
+    if (array[mid] <= value) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return right;
+}
+
 var Minimap = function Minimap(data) {
+  var _this = this;
+
   _classCallCheck(this, Minimap);
 
   this.data = data;
+  var meta = data.shift();
+  var startTime = new Date(meta._D).getTime();
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = data[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var log = _step.value;
+      log._elapsedTime = new Date(log._D).getTime() - startTime;
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+        _iterator["return"]();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
   this.app = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Application"]({
-    width: 800,
-    height: 800
+    width: 819,
+    height: 819,
+    antialias: true
+  });
+  this.app.stage.transform.scale.set(0.1, 0.1);
+  var backgroundTexture = pixi_js__WEBPACK_IMPORTED_MODULE_0__["Texture"].from('./Sanhok_Main_High_Res.png');
+  var background = new pixi_js__WEBPACK_IMPORTED_MODULE_0__["Sprite"](backgroundTexture);
+  this.app.stage.addChild(background);
+  var positions = data.filter(function (log) {
+    return log._T === 'LogPlayerPosition' && log.common.isGame !== 0;
+  });
+  var characters = {};
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = positions[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var position = _step2.value;
+
+      if (!characters[position.character.accountId]) {
+        characters[position.character.accountId] = [];
+      }
+
+      characters[position.character.accountId].push(position);
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+        _iterator2["return"]();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  var players = {};
+
+  for (var accountId in characters) {
+    var character = characters[accountId][0].character;
+    var player = new _components_player__WEBPACK_IMPORTED_MODULE_1__["default"](character.playerName, character.teamId);
+    players[character.accountId] = player;
+    this.app.stage.addChild(player);
+  }
+
+  this.currentTime = 0;
+  this.app.ticker.add(function (delta) {
+    for (var _accountId in players) {
+      var _positions = characters[_accountId].map(function (log) {
+        return log.character.location;
+      });
+
+      var times = characters[_accountId].map(function (log) {
+        return log._elapsedTime;
+      });
+
+      var index = binarySearch(times, _this.currentTime);
+
+      if (index === -1) {
+        players[_accountId].x = -1000;
+        players[_accountId].y = -1000;
+      } else if (index + 1 === times.length) {
+        players[_accountId].x = _positions[index].x;
+        players[_accountId].y = _positions[index].y;
+      } else {
+        var diff = times[index + 1] - times[index];
+        var ratio = (_this.currentTime - times[index]) / diff;
+        players[_accountId].x = _positions[index].x * (1 - ratio) + _positions[index + 1].x * ratio;
+        players[_accountId].y = _positions[index].y * (1 - ratio) + _positions[index + 1].y * ratio;
+      }
+
+      players[_accountId].x *= 8192 / 400000;
+      players[_accountId].y *= 8192 / 400000; // console.log('Hello');
+    }
+
+    _this.currentTime += delta * window.speed;
   });
 };
 
+window.speed = 100;
 
 
 /***/ })
