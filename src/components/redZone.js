@@ -1,9 +1,11 @@
 import { Graphics } from 'pixi.js'
+import { findCurrentState } from "../utils";
 
 class RedZone extends Graphics {
-    constructor() {
+    constructor(data) {
         super();
 
+        this._data = data;
         this._radius = 0;
 
         this.beginFill(0xFF3333, 0.5);
@@ -23,6 +25,14 @@ class RedZone extends Graphics {
         this.beginFill(0xFF3333, 0.5);
         this.drawCircle(0, 0, value);
         this.endFill();
+    }
+
+    seek(time) {
+        let { before } = findCurrentState(this._data, time);
+        if (!before) return;
+
+        this.position.set(before.position.x, before.position.y);
+        this.radius = before.radius;
     }
 }
 

@@ -7,7 +7,7 @@ import { findCurrentState, getTime } from './utils';
 
 import { Background } from './assets';
 
-function normalizeData(data) {
+function normalizeData(data, ratio) {
     let meta = data.shift();
     let logs = {};
 
@@ -53,7 +53,10 @@ function normalizeData(data) {
 
         positions[accountId].push({
             elapsedTime: positionLog._elapsedTime,
-            location: positionLog.character.location,
+            location: {
+                x: positionLog.character.location.x * ratio,
+                y: positionLog.character.location.y * ratio,
+            },
         });
     }
 
@@ -61,7 +64,10 @@ function normalizeData(data) {
         player.positions = positions[player.accountId];
         player.positions.unshift({
             elapsedTime: 0,
-            location: player.location,
+            location: {
+                x: player.location.x * ratio,
+                y: player.location.y * ratio,
+            },
         });
     }
 
@@ -75,20 +81,29 @@ function normalizeData(data) {
 
         whiteCircle.push({
             elapsedTime: log._elapsedTime,
-            position: gameState.poisonGasWarningPosition,
-            radius: gameState.poisonGasWarningRadius,
+            position: {
+                x: gameState.poisonGasWarningPosition.x * ratio,
+                y: gameState.poisonGasWarningPosition.y * ratio,
+            },
+            radius: gameState.poisonGasWarningRadius * ratio,
         });
 
         safetyZone.push({
             elapsedTime: log._elapsedTime,
-            position: gameState.safetyZonePosition,
-            radius: gameState.safetyZoneRadius,
+            position: {
+                x: gameState.safetyZonePosition.x * ratio,
+                y: gameState.safetyZonePosition.y * ratio,
+            },
+            radius: gameState.safetyZoneRadius * ratio,
         });
 
         redZone.push({
             elapsedTime: log._elapsedTime,
-            position: gameState.redZonePosition,
-            radius: gameState.redZoneRadius,
+            position: {
+                x: gameState.redZonePosition.x * ratio,
+                y: gameState.redZonePosition.y * ratio,
+            },
+            radius: gameState.redZoneRadius * ratio,
         });
     }
 
@@ -108,7 +123,7 @@ class Minimap {
         const size = 10000;
         const sizeRatio = size / mapSize;
 
-        data = normalizeData(data);
+        data = normalizeData(data, sizeRatio);
 
         this.data = data;
 
@@ -123,7 +138,7 @@ class Minimap {
 
         this.currentTime = 0;
 
-        // time increase
+        // Increase time
         this.app.ticker.add(delta => {
             this.currentTime += delta * window.speed;
         });
@@ -135,7 +150,7 @@ class Minimap {
         background.height = size;
         this.app.stage.addChild(background);
 
-        // Load player objects
+        // Create players
         let playerSprites = [];
 
         for (let player of data.players) {
@@ -147,72 +162,23 @@ class Minimap {
 
         this.app.ticker.add(() => {
             for (let player of playerSprites) {
-                let positions = player.positions;
-                let { before, after, ratio } = findCurrentState(positions, this.currentTime);
-
-                if (!before) {
-                    player.x = -1000;
-                    player.y = -1000;
-                    continue;
-                }
-
-                if (!after) {
-                    player.x = before.location.x * sizeRatio;
-                    player.y = before.location.y * sizeRatio;
-                    continue;
-                }
-
-                let x = before.location.x * ratio + after.location.x * (1 - ratio);
-                let y = before.location.y * ratio + after.location.y * (1 - ratio);
-
-                player.position.set(x * sizeRatio, y * sizeRatio);
+                player.seek(this.currentTime);
             }
         });
 
-        // white circle
-        let whiteCircle = new WhiteCircle();
+        // Create circles
+        let whiteCircle = new WhiteCircle(data.whiteCircle);
+        let redZone = new RedZone(data.redZone);
+        let safetyZone = new SafetyZone(data.safetyZone);
+
         this.app.stage.addChild(whiteCircle);
-
-        this.app.ticker.add(() => {
-            let { before } = findCurrentState(data.whiteCircle, this.currentTime);
-            if (!before) return;
-
-            whiteCircle.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-            whiteCircle.radius = before.radius * sizeRatio;
-        });
-
-        // red zone
-        let redZone = new RedZone();
+        this.app.stage.addChild(safetyZone);
         this.app.stage.addChild(redZone);
 
         this.app.ticker.add(() => {
-            let { before } = findCurrentState(data.redZone, this.currentTime);
-            if (!before) return;
-
-            redZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-            redZone.radius = before.radius * sizeRatio;
-        });
-
-        // safety zone
-        let safetyZone = new SafetyZone();
-        this.app.stage.addChild(safetyZone);
-
-        this.app.ticker.add(() => {
-            let { before, after, ratio } = findCurrentState(data.safetyZone, this.currentTime);
-            if (!before) return;
-            if (!after) {
-                safetyZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-                safetyZone.radius = before.radius * sizeRatio;
-                return;
-            }
-
-            let x = before.position.x * ratio + after.position.x * (1 - ratio);
-            let y = before.position.y * ratio + after.position.y * (1 - ratio);
-            let radius = before.radius * ratio + after.radius * (1 - ratio);
-
-            safetyZone.position.set(x * sizeRatio, y * sizeRatio);
-            safetyZone.radius = radius * sizeRatio;
-            // safetyZone.resizeCircle(radius * sizeRatio);
+            whiteCircle.seek(this.currentTime);
+            redZone.seek(this.currentTime);
+            safetyZone.seek(this.currentTime);
         });
     }
 }
