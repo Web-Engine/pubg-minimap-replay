@@ -29,4 +29,16 @@ const Background = {
     // },
 };
 
-export { Background };
+import CarePackageFlying from './assets/icons/CarePackage_Flying.png';
+import CarePackageNormal from './assets/icons/CarePackage_Normal.png';
+import CarePackageOpen from './assets/icons/CarePackage_Open.png';
+
+const Icon = {
+    CarePackage: {
+        Flying: CarePackageFlying,
+        Normal: CarePackageNormal,
+        Open: CarePackageOpen,
+    },
+};
+
+export { Background, Icon };
