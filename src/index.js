@@ -3,6 +3,7 @@ import Player from './components/player'
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
+import CarePackage from './components/carePackage';
 import { findCurrentState, getTime } from './utils';
 
 import { Background } from './assets';
@@ -92,11 +93,17 @@ function normalizeData(data) {
         });
     }
 
+    let carePackages = logs.LogCarePackageSpawn.map(spawn => ({
+        elapsedTime: spawn._elapsedTime,
+        location: spawn.itemPackage.location,
+    }));
+
     return {
         players,
         whiteCircle,
         safetyZone,
-        redZone
+        redZone,
+        carePackages,
     };
     // return data;
 }
@@ -213,6 +220,31 @@ class Minimap {
             safetyZone.position.set(x * sizeRatio, y * sizeRatio);
             safetyZone.radius = radius * sizeRatio;
             // safetyZone.resizeCircle(radius * sizeRatio);
+        });
+
+        let carePackageSprites = [];
+
+        for (let carePackage of data.carePackages) {
+            let carePackageSprite = new CarePackage({
+                location: {
+                    x: carePackage.location.x * sizeRatio,
+                    y: carePackage.location.y * sizeRatio,
+                },
+                spawnTime: carePackage.elapsedTime,
+            });
+
+            carePackageSprite.visible = false;
+            this.app.stage.addChild(carePackageSprite);
+
+            carePackageSprites.push(carePackageSprite);
+        }
+
+        this.app.ticker.add(() => {
+            for (let carePackage of carePackageSprites) {
+                if(carePackage.spawnTime <= this.currentTime) {
+                    carePackage.visible = true;
+                }
+            }
         });
     }
 }
