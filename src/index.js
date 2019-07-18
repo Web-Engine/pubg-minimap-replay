@@ -5,7 +5,7 @@ import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import { binarySearch } from './utils';
 
-import SanhokBackground from './assets/Sanhok_Main_Low_Res.png';
+import { SanhokBackground } from './assets';
 
 class Minimap {
     constructor(data) {
