@@ -3,26 +3,116 @@ import Player from './components/player'
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
-import { binarySearch } from './utils';
+import { findCurrentState, getTime } from './utils';
 
 import { Background } from './assets';
+
+function normalizeData(data) {
+    let meta = data.shift();
+    let logs = {};
+
+    for (let log of data) {
+        if (!(log._T in logs)) {
+            logs[log._T] = [];
+        }
+
+        logs[log._T].push(log);
+    }
+
+    if (!('LogMatchStart' in logs)) {
+        throw "Doesn't have match start data";
+    }
+
+    if (!('LogMatchEnd' in logs)) {
+        throw "Doesn't have match end data";
+    }
+
+    let matchStart = logs.LogMatchStart[0];
+    let matchEnd = logs.LogMatchEnd[0];
+
+    let startTime = getTime(matchStart._D);
+    for (let log of data) {
+        log._elapsedTime = getTime(log._D) - startTime;
+    }
+
+    // Load map data
+    let mapName = matchStart.mapName;
+
+    // Load player data
+    let players = matchStart.characters;
+
+    let positions = {};
+    for (let positionLog of logs.LogPlayerPosition) {
+        let accountId = positionLog.character.accountId;
+
+        if (!(accountId in positions)) {
+            positions[accountId] = [];
+        }
+
+        if (positionLog._elapsedTime < 0) continue;
+
+        positions[accountId].push({
+            elapsedTime: positionLog._elapsedTime,
+            location: positionLog.character.location,
+        });
+    }
+
+    for (let player of players) {
+        player.positions = positions[player.accountId];
+        player.positions.unshift({
+            elapsedTime: 0,
+            location: player.location,
+        });
+    }
+
+    // Load game states
+    let whiteCircle = [];
+    let safetyZone = [];
+    let redZone = [];
+
+    for (let log of logs.LogGameStatePeriodic) {
+        let gameState = log.gameState;
+
+        whiteCircle.push({
+            elapsedTime: log._elapsedTime,
+            position: gameState.poisonGasWarningPosition,
+            radius: gameState.poisonGasWarningRadius,
+        });
+
+        safetyZone.push({
+            elapsedTime: log._elapsedTime,
+            position: gameState.safetyZonePosition,
+            radius: gameState.safetyZoneRadius,
+        });
+
+        redZone.push({
+            elapsedTime: log._elapsedTime,
+            position: gameState.redZonePosition,
+            radius: gameState.redZoneRadius,
+        });
+    }
+
+    return {
+        players,
+        whiteCircle,
+        safetyZone,
+        redZone
+    };
+    // return data;
+}
 
 class Minimap {
     constructor(data) {
         const canvasSize = 819;
         const mapSize = 400000;
         const size = 10000;
-        const ratio = size / mapSize;
+        const sizeRatio = size / mapSize;
+
+        data = normalizeData(data);
 
         this.data = data;
 
-        let meta = data.shift();
-        let startTime = new Date(meta._D).getTime();
-
-        for (let log of data) {
-            log._elapsedTime = new Date(log._D).getTime() - startTime;
-        }
-
+        // Create pixi application
         this.app = new Application({
             width: canvasSize,
             height: canvasSize,
@@ -31,142 +121,95 @@ class Minimap {
 
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
 
+        this.currentTime = 0;
+
+        // time increase
+        this.app.ticker.add(delta => {
+            this.currentTime += delta * window.speed;
+        });
+
+        // Load background sprite
         const backgroundTexture = Texture.from(Background.Sanhok.low);
         const background = new Sprite(backgroundTexture);
         background.width = size;
         background.height = size;
-
         this.app.stage.addChild(background);
 
-        let positions = data.filter(log => log._T === 'LogPlayerPosition' && log.common.isGame !== 0);
+        // Load player objects
+        let playerSprites = [];
 
-        let characters = {};
-        for (let position of positions) {
-            let accountId = position.character.accountId;
+        for (let player of data.players) {
+            let playerSprite = new Player(player);
+            this.app.stage.addChild(playerSprite);
 
-            if (!characters[accountId]) {
-                characters[accountId] = [];
-            }
-
-            characters[accountId].push(position);
+            playerSprites.push(playerSprite);
         }
 
-        let players = {};
-        for (let accountId in characters) {
-            let character = characters[accountId][0].character;
-            let player = new Player(character.teamId);
+        this.app.ticker.add(() => {
+            for (let player of playerSprites) {
+                let positions = player.positions;
+                let { before, after, ratio } = findCurrentState(positions, this.currentTime);
 
-            players[character.accountId] = player;
-            this.app.stage.addChild(player);
-        }
-
-        this.currentTime = 0;
-
-        this.app.ticker.add(delta => {
-            for (let accountId in players) {
-                let positions = characters[accountId].map(log => log.character.location);
-                let times = characters[accountId].map(log => log._elapsedTime);
-                let index = binarySearch(times, this.currentTime);
-
-                if (index === -1) {
-                    players[accountId].x = -1000;
-                    players[accountId].y = -1000;
-                }
-                else if (index + 1 === times.length) {
-                    players[accountId].x = positions[index].x;
-                    players[accountId].y = positions[index].y;
-                }
-                else {
-                    let diff = times[index + 1] - times[index];
-                    let ratio = (this.currentTime - times[index]) / diff;
-
-                    players[accountId].x = positions[index].x * (1 - ratio) + positions[index + 1].x * ratio;
-                    players[accountId].y = positions[index].y * (1 - ratio) + positions[index + 1].y * ratio;
+                if (!before) {
+                    player.x = -1000;
+                    player.y = -1000;
+                    continue;
                 }
 
-                players[accountId].x *= ratio;
-                players[accountId].y *= ratio;
+                if (!after) {
+                    player.x = before.location.x * sizeRatio;
+                    player.y = before.location.y * sizeRatio;
+                    continue;
+                }
+
+                player.x = (before.location.x * ratio + after.location.x * (1 - ratio)) * sizeRatio;
+                player.y = (before.location.y * ratio + after.location.y * (1 - ratio)) * sizeRatio;
             }
         });
 
-        let gameStates = data.filter(log => log._T === 'LogGameStatePeriodic');
-        let position = { x: 0, y: 0 };
-        let radius = 0;
-
-        let whiteCircle = new WhiteCircle(position.x, position.y, radius);
+        // white circle
+        let whiteCircle = new WhiteCircle(0, 0, 0);
         this.app.stage.addChild(whiteCircle);
 
-        this.app.ticker.add(delta => {
-            let index = gameStates.findIndex(log => log._elapsedTime > this.currentTime);
+        this.app.ticker.add(() => {
+            let { before } = findCurrentState(data.whiteCircle, this.currentTime);
+            if (!before) return;
 
-            if (index === -1) return;
-            if (index === 0) return;
-
-            whiteCircle.position.x = gameStates[index - 1].gameState.poisonGasWarningPosition.x * ratio;
-            whiteCircle.position.y = gameStates[index - 1].gameState.poisonGasWarningPosition.y * ratio;
-            whiteCircle.resizeCircle(gameStates[index - 1].gameState.poisonGasWarningRadius * ratio);
+            whiteCircle.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
+            whiteCircle.resizeCircle(before.radius * sizeRatio);
         });
 
-        let redZone = new RedZone(position.x, position.y, radius);
+        // red zone
+        let redZone = new RedZone(0, 0, 0);
         this.app.stage.addChild(redZone);
 
-        this.app.ticker.add(delta => {
-            let index = gameStates.findIndex(log => log._elapsedTime > this.currentTime);
+        this.app.ticker.add(() => {
+            let { before } = findCurrentState(data.redZone, this.currentTime);
+            if (!before) return;
 
-            if (index === -1) return;
-            if (index === 0) return;
-
-            redZone.position.x = gameStates[index - 1].gameState.redZonePosition.x * ratio;
-            redZone.position.y = gameStates[index - 1].gameState.redZonePosition.y * ratio;
-            redZone.resizeCircle(gameStates[index - 1].gameState.redZoneRadius * ratio);
+            redZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
+            redZone.resizeCircle(before.radius * sizeRatio);
         });
 
-        let safetyZone = new SafetyZone(gameStates[0].gameState.safetyZonePosition.x, gameStates[0].gameState.safetyZonePosition.y,gameStates[0].gameState.safetyZoneRadius);
+        // safety zone
+        let safetyZone = new SafetyZone(0, 0, 0);
         this.app.stage.addChild(safetyZone);
 
-        this.app.ticker.add(delta => {
-            let i;
-            for (i = 0; i < gameStates.length; i++) {
-                let log = gameStates[i];
-                if (log._elapsedTime > this.currentTime) break;
+        this.app.ticker.add(() => {
+            let { before, after, ratio } = findCurrentState(data.safetyZone, this.currentTime);
+            if (!before) return;
+            if (!after) {
+                safetyZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
+                safetyZone.resizeCircle(before.radius * sizeRatio);
+                return;
             }
 
-            if (i === gameStates.length) {
-                position = gameStates[gameStates.length - 1].gameState.safetyZonePosition;
-                radius = gameStates[gameStates.length - 1].gameState.safetyZoneRadius;
-            }
+            let x = before.position.x * ratio + after.position.x * (1 - ratio);
+            let y = before.position.y * ratio + after.position.y * (1 - ratio);
+            let radius = before.radius * ratio + after.radius * (1 - ratio);
 
-            else if (i !== 0) {
-                let before = gameStates[i - 1];
-                let after = gameStates[i];
-
-                let diffTime = after._elapsedTime - before._elapsedTime;
-                let ratio = (this.currentTime - before._elapsedTime) / diffTime;
-
-                let beforeState = before.gameState;
-                let afterState = after.gameState;
-
-                let beforePosition = beforeState.safetyZonePosition;
-                let afterPosition = afterState.safetyZonePosition;
-
-                let beforeRadius = beforeState.safetyZoneRadius;
-                let afterRadius = afterState.safetyZoneRadius;
-
-                position = {
-                    x: beforePosition.x * (1 - ratio) + afterPosition.x * ratio,
-                    y: beforePosition.y * (1 - ratio) + afterPosition.y * ratio,
-                };
-
-                radius = beforeRadius * (1 - ratio) + afterRadius * ratio;
-            }
-
-            safetyZone.position.x = position.x * ratio;
-            safetyZone.position.y = position.y * ratio;
-            safetyZone.resizeCircle(radius * ratio);
-        });
-
-        this.app.ticker.add(delta => {
-            this.currentTime += delta * window.speed;
+            safetyZone.position.set(x * sizeRatio, y * sizeRatio);
+            safetyZone.resizeCircle(radius * sizeRatio);
         });
     }
 }
