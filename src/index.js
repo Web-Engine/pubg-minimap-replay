@@ -84,8 +84,8 @@ class Minimap {
                     players[accountId].y = positions[index].y * (1 - ratio) + positions[index + 1].y * ratio;
                 }
 
-                players[accountId].x *=  ratio;
-                players[accountId].y *=  ratio;
+                players[accountId].x *= ratio;
+                players[accountId].y *= ratio;
             }
         });
 
