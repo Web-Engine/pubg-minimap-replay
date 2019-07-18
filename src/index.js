@@ -54,7 +54,7 @@ class Minimap {
         let players = {};
         for (let accountId in characters) {
             let character = characters[accountId][0].character;
-            let player = new Player(character.name, character.teamId);
+            let player = new Player(character.teamId);
 
             players[character.accountId] = player;
             this.app.stage.addChild(player);
