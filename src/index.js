@@ -162,13 +162,15 @@ class Minimap {
                     continue;
                 }
 
-                player.x = (before.location.x * ratio + after.location.x * (1 - ratio)) * sizeRatio;
-                player.y = (before.location.y * ratio + after.location.y * (1 - ratio)) * sizeRatio;
+                let x = before.location.x * ratio + after.location.x * (1 - ratio);
+                let y = before.location.y * ratio + after.location.y * (1 - ratio);
+
+                player.position.set(x * sizeRatio, y * sizeRatio);
             }
         });
 
         // white circle
-        let whiteCircle = new WhiteCircle(0, 0, 0);
+        let whiteCircle = new WhiteCircle();
         this.app.stage.addChild(whiteCircle);
 
         this.app.ticker.add(() => {
@@ -176,11 +178,11 @@ class Minimap {
             if (!before) return;
 
             whiteCircle.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-            whiteCircle.resizeCircle(before.radius * sizeRatio);
+            whiteCircle.radius = before.radius * sizeRatio;
         });
 
         // red zone
-        let redZone = new RedZone(0, 0, 0);
+        let redZone = new RedZone();
         this.app.stage.addChild(redZone);
 
         this.app.ticker.add(() => {
@@ -188,11 +190,11 @@ class Minimap {
             if (!before) return;
 
             redZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-            redZone.resizeCircle(before.radius * sizeRatio);
+            redZone.radius = before.radius * sizeRatio;
         });
 
         // safety zone
-        let safetyZone = new SafetyZone(0, 0, 0);
+        let safetyZone = new SafetyZone();
         this.app.stage.addChild(safetyZone);
 
         this.app.ticker.add(() => {
@@ -200,7 +202,7 @@ class Minimap {
             if (!before) return;
             if (!after) {
                 safetyZone.position.set(before.position.x * sizeRatio, before.position.y * sizeRatio);
-                safetyZone.resizeCircle(before.radius * sizeRatio);
+                safetyZone.radius = before.radius * sizeRatio;
                 return;
             }
 
@@ -209,7 +211,8 @@ class Minimap {
             let radius = before.radius * ratio + after.radius * (1 - ratio);
 
             safetyZone.position.set(x * sizeRatio, y * sizeRatio);
-            safetyZone.resizeCircle(radius * sizeRatio);
+            safetyZone.radius = radius * sizeRatio;
+            // safetyZone.resizeCircle(radius * sizeRatio);
         });
     }
 }
