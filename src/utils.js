@@ -158,8 +158,11 @@ function normalizeData(data, ratio) {
     }
 
     let carePackages = logs.LogCarePackageSpawn.map(spawn => ({
-        elapsedTime: spawn._elapsedTime,
-        location: spawn.itemPackage.location,
+        spawnTime: spawn._elapsedTime,
+        location: {
+            x: spawn.itemPackage.location.x * ratio,
+            y: spawn.itemPackage.location.y * ratio,
+        },
     }));
 
     return {

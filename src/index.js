@@ -79,17 +79,12 @@ class Minimap extends utils.EventEmitter {
             safetyZone.seek(this.currentTime);
         });
 
+
+        // Create care packages
         let carePackageSprites = [];
 
         for (let carePackage of data.carePackages) {
-            let carePackageSprite = new CarePackage({
-                location: {
-                    x: carePackage.location.x * sizeRatio,
-                    y: carePackage.location.y * sizeRatio,
-                },
-                spawnTime: carePackage.elapsedTime,
-            });
-
+            let carePackageSprite = new CarePackage(carePackage);
             carePackageSprite.visible = false;
             this.app.stage.addChild(carePackageSprite);
 
@@ -98,9 +93,7 @@ class Minimap extends utils.EventEmitter {
 
         this.app.ticker.add(() => {
             for (let carePackage of carePackageSprites) {
-                if(carePackage.spawnTime <= this.currentTime) {
-                    carePackage.visible = true;
-                }
+                carePackage.seek(this.currentTime);
             }
         });
     }

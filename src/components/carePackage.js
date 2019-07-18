@@ -10,6 +10,10 @@ class CarePackage extends Sprite {
 
         this.spawnTime = data.spawnTime;
     }
+
+    seek(time) {
+        this.visible = this.spawnTime <= time;
+    }
 }
 
 export default CarePackage;
