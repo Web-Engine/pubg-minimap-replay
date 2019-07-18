@@ -79,7 +79,6 @@ class Minimap extends utils.EventEmitter {
             safetyZone.seek(this.currentTime);
         });
 
-
         // Create care packages
         let carePackageSprites = [];
 

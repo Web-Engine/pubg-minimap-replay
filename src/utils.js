@@ -165,6 +165,15 @@ function normalizeData(data, ratio) {
         },
     }));
 
+    for (let i = 0; i < carePackages.length; i++)
+    {
+        let log = logs.LogCarePackageLand[i];
+
+        carePackages[i].landTime = log._elapsedTime;
+    }
+
+    console.log(carePackages);
+
     return {
         players,
         whiteCircle,
