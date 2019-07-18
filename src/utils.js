@@ -57,8 +57,116 @@ function findCurrentState(array, time) {
     return { before, after, ratio };
 }
 
+function normalizeData(data, ratio) {
+    let meta = data.shift();
+    let logs = {};
+
+    for (let log of data) {
+        if (!(log._T in logs)) {
+            logs[log._T] = [];
+        }
+
+        logs[log._T].push(log);
+    }
+
+    if (!('LogMatchStart' in logs)) {
+        throw "Doesn't have match start data";
+    }
+
+    if (!('LogMatchEnd' in logs)) {
+        throw "Doesn't have match end data";
+    }
+
+    let matchStart = logs.LogMatchStart[0];
+    let matchEnd = logs.LogMatchEnd[0];
+
+    let startTime = getTime(matchStart._D);
+    for (let log of data) {
+        log._elapsedTime = getTime(log._D) - startTime;
+    }
+
+    // Load map data
+    let mapName = matchStart.mapName;
+
+    // Load player data
+    let players = matchStart.characters;
+
+    let positions = {};
+    for (let positionLog of logs.LogPlayerPosition) {
+        let accountId = positionLog.character.accountId;
+
+        if (!(accountId in positions)) {
+            positions[accountId] = [];
+        }
+
+        if (positionLog._elapsedTime < 0) continue;
+
+        positions[accountId].push({
+            elapsedTime: positionLog._elapsedTime,
+            location: {
+                x: positionLog.character.location.x * ratio,
+                y: positionLog.character.location.y * ratio,
+            },
+        });
+    }
+
+    for (let player of players) {
+        player.positions = positions[player.accountId];
+        player.positions.unshift({
+            elapsedTime: 0,
+            location: {
+                x: player.location.x * ratio,
+                y: player.location.y * ratio,
+            },
+        });
+    }
+
+    // Load game states
+    let whiteCircle = [];
+    let safetyZone = [];
+    let redZone = [];
+
+    for (let log of logs.LogGameStatePeriodic) {
+        let gameState = log.gameState;
+
+        whiteCircle.push({
+            elapsedTime: log._elapsedTime,
+            position: {
+                x: gameState.poisonGasWarningPosition.x * ratio,
+                y: gameState.poisonGasWarningPosition.y * ratio,
+            },
+            radius: gameState.poisonGasWarningRadius * ratio,
+        });
+
+        safetyZone.push({
+            elapsedTime: log._elapsedTime,
+            position: {
+                x: gameState.safetyZonePosition.x * ratio,
+                y: gameState.safetyZonePosition.y * ratio,
+            },
+            radius: gameState.safetyZoneRadius * ratio,
+        });
+
+        redZone.push({
+            elapsedTime: log._elapsedTime,
+            position: {
+                x: gameState.redZonePosition.x * ratio,
+                y: gameState.redZonePosition.y * ratio,
+            },
+            radius: gameState.redZoneRadius * ratio,
+        });
+    }
+
+    return {
+        players,
+        whiteCircle,
+        safetyZone,
+        redZone
+    };
+}
+
 function getTime(str) {
     return new Date(str).getTime();
 }
 
-export { binarySearch, getTime, findCurrentState };
+export { binarySearch, getTime, findCurrentState, normalizeData };
