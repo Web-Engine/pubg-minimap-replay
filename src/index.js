@@ -5,7 +5,7 @@ import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import { binarySearch } from './utils';
 
-import { SanhokBackground } from './assets';
+import { Background } from './assets';
 
 class Minimap {
     constructor(data) {
@@ -31,7 +31,7 @@ class Minimap {
 
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
 
-        const backgroundTexture = Texture.from(SanhokBackground);
+        const backgroundTexture = Texture.from(Background.Sanhok.low);
         const background = new Sprite(backgroundTexture);
         background.width = size;
         background.height = size;
