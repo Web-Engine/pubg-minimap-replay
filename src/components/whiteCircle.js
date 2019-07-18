@@ -1,4 +1,4 @@
-import { Graphics, Text } from 'pixi.js'
+import { Graphics } from 'pixi.js'
 
 class WhiteCircle extends Graphics {
     constructor(x ,y, radius) {
