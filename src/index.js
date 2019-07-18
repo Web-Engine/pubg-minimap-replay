@@ -7,22 +7,23 @@ import { normalizeData } from './utils';
 
 import { Background } from './assets';
 
+const canvasSize = 819;
+const mapSize = 400000;
+const size = 10000;
+
 class Minimap {
     constructor(data) {
-        const canvasSize = 819;
-        const mapSize = 400000;
-        const size = 10000;
         const sizeRatio = size / mapSize;
 
         data = normalizeData(data, sizeRatio);
 
-        this.data = data;
+        this._data = data;
 
         // Create pixi application
         this.app = new Application({
             width: canvasSize,
             height: canvasSize,
-            antialias: true
+            antialias: true,
         });
 
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
@@ -71,6 +72,11 @@ class Minimap {
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
         });
+    }
+
+    resize(canvasSize) {
+        this.app.renderer.resize(canvasSize, canvasSize);
+        this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
     }
 }
 
