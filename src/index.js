@@ -1,4 +1,4 @@
-import { Application, Texture, Sprite } from 'pixi.js';
+import { Application, Texture, Sprite, Point, utils } from 'pixi.js';
 import Player from './components/player'
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
@@ -11,11 +11,16 @@ const canvasSize = 819;
 const mapSize = 400000;
 const size = 10000;
 
-class Minimap {
+class Minimap extends utils.EventEmitter {
     constructor(data) {
+        super();
+
         const sizeRatio = size / mapSize;
 
         data = normalizeData(data, sizeRatio);
+
+        this._zoomFactor = 1;
+        this._centerPosition = new Point(size / 2, size / 2);
 
         this._data = data;
 
@@ -46,7 +51,7 @@ class Minimap {
         let playerSprites = [];
 
         for (let player of data.players) {
-            let playerSprite = new Player(player);
+            let playerSprite = new Player(this, player);
             this.app.stage.addChild(playerSprite);
 
             playerSprites.push(playerSprite);
@@ -59,9 +64,9 @@ class Minimap {
         });
 
         // Create circles
-        let whiteCircle = new WhiteCircle(data.whiteCircle);
-        let redZone = new RedZone(data.redZone);
-        let safetyZone = new SafetyZone(data.safetyZone);
+        let whiteCircle = new WhiteCircle(this, data.whiteCircle);
+        let redZone = new RedZone(this, data.redZone);
+        let safetyZone = new SafetyZone(this, data.safetyZone);
 
         this.app.stage.addChild(whiteCircle);
         this.app.stage.addChild(safetyZone);
@@ -72,6 +77,30 @@ class Minimap {
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
         });
+    }
+
+    get zoomFactor() {
+        return this._zoomFactor;
+    }
+
+    get centerPosition() {
+        return this._centerPosition;
+    }
+
+    zoom(factor, position = null) {
+        this._zoomFactor = factor;
+
+        if (position) {
+            this._centerPosition = position;
+        }
+
+        let canvasSize = this.app.renderer.width;
+        this.app.stage.transform.scale.set(canvasSize / size * factor, canvasSize / size * factor);
+
+        this.app.stage.transform.position.x = (this._centerPosition.x / size) * canvasSize - canvasSize * factor / 2;
+        this.app.stage.transform.position.y = (this._centerPosition.y / size) * canvasSize - canvasSize * factor / 2;
+
+        this.emit('zoomChange', factor, position);
     }
 
     resize(canvasSize) {
