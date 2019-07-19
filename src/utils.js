@@ -165,10 +165,15 @@ const mapNames = {
 };
 
 function last(array) {
+    if (array.length === 0) return null;
+
     return array[array.length - 1];
 }
 
 function isLocationEqual(a, b) {
+    if (a === b) return true;
+    if (!a || !b) return false;
+
     return a.x === b.x && a.y === b.y;
 }
 
@@ -188,12 +193,7 @@ function normalizeData(logs, ratio) {
             teamId: 0,
             ranking: 0,
             locations: [],
-            healths: [
-                {
-                    health: 100,
-                    elapsedTime: 0,
-                }
-            ],
+            healths: [],
         };
 
         return data.players[accountId];
@@ -206,16 +206,12 @@ function normalizeData(logs, ratio) {
 
     function addPlayerLocation(character, elapsedTime) {
         let player = getPlayer(character.accountId);
+        let lastLocation = last(player.locations);
 
-        if (player.locations.length) {
-            let lastLocation = last(player.locations);
-
-            if (isLocationEqual(lastLocation, character.location)) {
-                return;
-            }
-        }
+        if (isLocationEqual(lastLocation, character.location)) return;
 
         let { x, y } = character.location;
+
         player.locations.push({
             location: { x, y },
             elapsedTime,
@@ -225,8 +221,8 @@ function normalizeData(logs, ratio) {
     function addPlayerHealth(character, elapsedTime) {
         let player = getPlayer(character.accountId);
 
-        let lastHealth = last(player.healths).health;
-        if (character.health === lastHealth) return;
+        let lastHealth = last(player.healths);
+        if (lastHealth && character.health === lastHealth.health) return;
 
         player.healths.push({
             health: character.health,
@@ -250,12 +246,10 @@ function normalizeData(logs, ratio) {
 
     let matchStart = logs.shift();
 
-    let startTime = getTime(matchStart._D);
-
     let data = {
         meta: {
-            mapName: null,
-            terrain: null,
+            mapName: mapNames[matchStart.mapName],
+            terrain: matchStart.mapName,
         },
         players: {},
         redZone: [],
@@ -264,6 +258,12 @@ function normalizeData(logs, ratio) {
         carePackages: [],
         alivePlayers: [],
     };
+
+    for (let character of matchStart.characters) {
+        addPlayerInformation(character, 0);
+    }
+
+    let startTime = getTime(matchStart._D);
 
     for (let log of logs)
     {
@@ -364,15 +364,9 @@ function normalizeData(logs, ratio) {
                 break;
             }
 
-            case 'LogMatchStart': {
-                for (let character of log.characters) {
-                    addPlayerInformation(character, elapsedTime);
-                }
-
-                data.meta.terrain = log.mapName;
-                data.meta.mapName = mapNames[data.meta.terrain];
-                break;
-            }
+            // case 'LogMatchStart': {
+            //     break;
+            // }
 
             case 'LogObjectDestroy': {
                 addPlayerInformation(log.character, elapsedTime);
