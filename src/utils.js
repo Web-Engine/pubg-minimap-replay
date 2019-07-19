@@ -57,6 +57,14 @@ function findCurrentState(array, time) {
     return { before, after, ratio };
 }
 
+const mapNames = {
+    Desert_Main: "Miramar",
+    DihorOtok_Main: "Vikendi",
+    Erangel_Main: "Erangel",
+    Range_Main: "Camp_Jackal",
+    Savage_Main: "Sanhok"
+};
+
 function normalizeData(data, ratio) {
     let meta = data.shift();
     let logs = {};
@@ -86,7 +94,8 @@ function normalizeData(data, ratio) {
     }
 
     // Load map data
-    let mapName = matchStart.mapName;
+    let terrain = matchStart.mapName;
+    let mapName = mapNames[terrain];
 
     // Load player data
     let players = matchStart.characters;
@@ -188,6 +197,10 @@ function normalizeData(data, ratio) {
     }
 
     return {
+        meta: {
+            terrain,
+            mapName,
+        },
         players,
         whiteCircle,
         safetyZone,

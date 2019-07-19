@@ -34,15 +34,16 @@ class Minimap extends utils.EventEmitter {
 
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
 
-        this.currentTime = 0;
+        this._currentTime = 0;
+        this._speed = 10;
 
         // Increase time
         this.app.ticker.add(delta => {
-            this.currentTime += delta * window.speed;
+            this._currentTime += 1000 * delta / 60 * this.speed;
         });
 
         // Load background sprite
-        const backgroundTexture = Texture.from(Background.Sanhok.low);
+        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
         const background = new Sprite(backgroundTexture);
         background.width = size;
         background.height = size;
@@ -83,8 +84,7 @@ class Minimap extends utils.EventEmitter {
         let carePackageSprites = [];
 
         for (let carePackage of data.carePackages) {
-            let carePackageSprite = new CarePackage(carePackage);
-            carePackageSprite.visible = false;
+            let carePackageSprite = new CarePackage(this, carePackage);
             this.app.stage.addChild(carePackageSprite);
 
             carePackageSprites.push(carePackageSprite);
@@ -107,7 +107,15 @@ class Minimap extends utils.EventEmitter {
         })
     }
 
-    get zoomFactor() {
+    play() {
+        this.app.start();
+    }
+
+    pause() {
+        this.app.stop();
+    }
+
+    get zoom() {
         return this._zoomFactor;
     }
 
@@ -115,7 +123,7 @@ class Minimap extends utils.EventEmitter {
         return this._centerPosition;
     }
 
-    zoom(factor, position = null) {
+    setZoom(factor, position = null) {
         this._zoomFactor = factor;
 
         if (position) {
@@ -135,8 +143,22 @@ class Minimap extends utils.EventEmitter {
         this.app.renderer.resize(canvasSize, canvasSize);
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
     }
-}
 
-window.speed = 100;
+    get speed() {
+        return this._speed;
+    }
+
+    set speed(value) {
+        this._speed = value;
+    }
+
+    get currentTime() {
+        return this._currentTime;
+    }
+
+    set currentTime(value) {
+        this._currentTime = value;
+    }
+}
 
 export { Minimap };

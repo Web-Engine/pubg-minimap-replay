@@ -26,7 +26,7 @@ class WhiteCircle extends Graphics {
 
         this.clear();
 
-        this.lineStyle(15 / this._minimap.zoomFactor, 0xFFFFFF, 1);
+        this.lineStyle(15 / this._minimap.zoom, 0xFFFFFF, 1);
         this.drawCircle(0, 0, value);
     }
 
