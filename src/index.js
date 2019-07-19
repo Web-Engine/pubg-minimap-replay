@@ -43,7 +43,7 @@ class Minimap extends utils.EventEmitter {
         });
 
         // Load background sprite
-        const backgroundTexture = Texture.from(Background.Sanhok.low);
+        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
         const background = new Sprite(backgroundTexture);
         background.width = size;
         background.height = size;
