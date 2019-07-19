@@ -85,7 +85,6 @@ class Minimap extends utils.EventEmitter {
 
         for (let carePackage of data.carePackages) {
             let carePackageSprite = new CarePackage(carePackage);
-            carePackageSprite.visible = false;
             this.app.stage.addChild(carePackageSprite);
 
             carePackageSprites.push(carePackageSprite);
