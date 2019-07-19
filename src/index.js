@@ -4,8 +4,8 @@ import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
-import { normalizeData } from './utils';
-
+import {findCurrentState, normalizeData} from './utils';
+import { NumAlivePlayers, AlivePlayersText } from "./components/alivePlavers";
 import { Background } from './assets';
 
 const canvasSize = 819;
@@ -95,6 +95,16 @@ class Minimap extends utils.EventEmitter {
                 carePackage.seek(this.currentTime);
             }
         });
+
+        let numAlivePlayers = new NumAlivePlayers(data.alivePlayers);
+        let alivePlayersText = new AlivePlayersText();
+
+        this.app.stage.addChild(numAlivePlayers);
+        this.app.stage.addChild(alivePlayersText);
+
+        this.app.ticker.add(() => {
+            numAlivePlayers.seek(this.currentTime);
+        })
     }
 
     get zoomFactor() {

@@ -172,12 +172,28 @@ function normalizeData(data, ratio) {
         carePackages[i].landTime = log._elapsedTime;
     }
 
+    let alivePlayers = [];
+    let beforeNumAlivePlayers = 0;
+    for (let positionLog of logs.LogPlayerPosition)
+    {
+        if (positionLog._elapsedTime < 0) continue;
+        if (beforeNumAlivePlayers === positionLog.numAlivePlayers) continue;
+
+        alivePlayers.push({
+            elapsedTime: positionLog._elapsedTime,
+            numAlivePlayers: positionLog.numAlivePlayers,
+        });
+
+        beforeNumAlivePlayers = positionLog.numAlivePlayers;
+    }
+
     return {
         players,
         whiteCircle,
         safetyZone,
         redZone,
         carePackages,
+        alivePlayers,
     };
 }
 
