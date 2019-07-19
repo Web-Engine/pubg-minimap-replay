@@ -57,6 +57,104 @@ function findCurrentState(array, time) {
     return { before, after, ratio };
 }
 
+
+
+// normalized data should be formatted like:
+// {
+//     let string = '';
+//     let number = 1.234;
+//     let int = 1;
+//
+//     let accountId = string;
+//
+//     let data = {
+//         meta: {
+//             mapName: string, // Erangel, Miramar, Vikendi, Sanhok, Camp_Jackal
+//             terrain: string, // Erangel_Main, Desert_Main, DihorOtok_Main, Savage_Main, Range_Main
+//         },
+//
+//         players: {
+//             [accountId]: {
+//                 name: string,
+//                 teamId: int,
+//                 ranking: int,
+//                 locations: [
+//                     {
+//                         location: {
+//                             x: number,
+//                             y: number,
+//                         },
+//                         elapsedTime: number,
+//                     },
+//                     // ...
+//                 ],
+//                 healths: [
+//                     {
+//                         health: number,
+//                         elapsedTime: number,
+//                     },
+//                     // ...
+//                 ],
+//             },
+//         },
+//
+//         redZone: [
+//             {
+//                 location: {
+//                     x: number,
+//                     y: number,
+//                 },
+//                 radius: number,
+//             },
+//         ],
+//
+//         safetyArea: [
+//             {
+//                 location: {
+//                     x: number,
+//                     y: number,
+//                 },
+//                 radius: number,
+//             },
+//         ],
+//
+//         whiteCircle: [
+//             {
+//                 location: {
+//                     x: number,
+//                     y: number,
+//                     z: number,
+//                 },
+//                 radius: number,
+//             },
+//             // ...
+//         ],
+//
+//         alivePlayers: [
+//             {
+//                 numAlivePlayers: int,
+//                 elapsedTime: number,
+//             }
+//         ],
+//
+//         carePackages: [
+//             {
+//                 spawnTime: number,
+//                 spawnLocation: {
+//                     x: number,
+//                     y: number,
+//                 },
+//                 landTime: number,
+//                 landLocation: {
+//                     x: number,
+//                     y: number,
+//                 },
+//             },
+//             // ...
+//         ],
+//     }
+// }
+
 const mapNames = {
     Desert_Main: "Miramar",
     DihorOtok_Main: "Vikendi",
