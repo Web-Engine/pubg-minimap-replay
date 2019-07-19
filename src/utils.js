@@ -172,8 +172,6 @@ function normalizeData(data, ratio) {
         carePackages[i].landTime = log._elapsedTime;
     }
 
-    console.log(carePackages);
-
     return {
         players,
         whiteCircle,
