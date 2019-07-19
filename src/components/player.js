@@ -9,7 +9,7 @@ class Player extends Container {
         this.data = data;
         this.name = data.name;
         this.accountId = data.accountId;
-        this.positions = data.positions;
+        this.locations = data.locations;
 
         let backgroundCircle = new Graphics();
         this.addChild(backgroundCircle);
@@ -36,8 +36,7 @@ class Player extends Container {
     }
 
     seek(time) {
-        let positions = this.positions;
-        let { before, after, ratio } = findCurrentState(positions, time);
+        let { before, after, ratio } = findCurrentState(this.locations, time);
 
         if (!before) {
             this.x = -1000;

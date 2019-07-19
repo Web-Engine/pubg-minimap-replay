@@ -52,7 +52,7 @@ class Minimap extends utils.EventEmitter {
         // Create players
         let playerSprites = [];
 
-        for (let player of data.players) {
+        for (let player of Object.values(data.players)) {
             let playerSprite = new Player(this, player);
             this.app.stage.addChild(playerSprite);
 

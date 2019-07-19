@@ -96,6 +96,7 @@ function findCurrentState(array, time) {
 //                     // ...
 //                 ],
 //             },
+//             ...
 //         },
 //
 //         redZone: [
@@ -163,133 +164,347 @@ const mapNames = {
     Savage_Main: "Sanhok"
 };
 
-function normalizeData(data, ratio) {
-    let meta = data.shift();
-    let logs = {};
+function last(array) {
+    return array[array.length - 1];
+}
 
-    for (let log of data) {
-        if (!(log._T in logs)) {
-            logs[log._T] = [];
+function isLocationEqual(a, b) {
+    return a.x === b.x && a.y === b.y;
+}
+
+function normalizeData(logs, ratio) {
+    function isPlayer(character) {
+        return character && character.accountId;
+    }
+
+    function getPlayer(accountId) {
+        if (accountId in data.players) {
+            return data.players[accountId];
         }
 
-        logs[log._T].push(log);
+        data.players[accountId] = {
+            accountId,
+            name: null,
+            teamId: 0,
+            ranking: 0,
+            locations: [],
+            healths: [
+                {
+                    health: 100,
+                    elapsedTime: 0,
+                }
+            ],
+        };
+
+        return data.players[accountId];
     }
 
-    if (!('LogMatchStart' in logs)) {
-        throw "Doesn't have match start data";
+    function addPlayerInformation(character, elapsedTime) {
+        addPlayerLocation(character, elapsedTime);
+        addPlayerHealth(character, elapsedTime);
     }
 
-    if (!('LogMatchEnd' in logs)) {
-        throw "Doesn't have match end data";
+    function addPlayerLocation(character, elapsedTime) {
+        let player = getPlayer(character.accountId);
+
+        if (player.locations.length) {
+            let lastLocation = last(player.locations);
+
+            if (isLocationEqual(lastLocation, character.location)) {
+                return;
+            }
+        }
+
+        let { x, y } = character.location;
+        player.locations.push({
+            location: { x, y },
+            elapsedTime,
+        });
     }
 
-    let matchStart = logs.LogMatchStart[0];
-    let matchEnd = logs.LogMatchEnd[0];
+    function addPlayerHealth(character, elapsedTime) {
+        let player = getPlayer(character.accountId);
+
+        let lastHealth = last(player.healths).health;
+        if (character.health === lastHealth) return;
+
+        player.healths.push({
+            health: character.health,
+            elapsedTime,
+        });
+    }
+
+    {
+        let i;
+        for (i = 0; i < logs.length; i++)
+        {
+            if (logs[i]._T === 'LogMatchStart') break;
+        }
+
+        logs.splice(0, i);
+    }
+
+    if (logs.length === 0) {
+        throw 'Cannot found match start data';
+    }
+
+    let matchStart = logs.shift();
 
     let startTime = getTime(matchStart._D);
-    for (let log of data) {
-        log._elapsedTime = getTime(log._D) - startTime;
-    }
 
-    // Load map data
-    let terrain = matchStart.mapName;
-    let mapName = mapNames[terrain];
-
-    // Load player data
-    let players = matchStart.characters;
-
-    let positions = {};
-    for (let positionLog of logs.LogPlayerPosition) {
-        let accountId = positionLog.character.accountId;
-
-        if (!(accountId in positions)) {
-            positions[accountId] = [];
-        }
-
-        if (positionLog._elapsedTime < 0) continue;
-
-        positions[accountId].push({
-            elapsedTime: positionLog._elapsedTime,
-            location: {
-                x: positionLog.character.location.x * ratio,
-                y: positionLog.character.location.y * ratio,
-            },
-        });
-    }
-
-    for (let player of players) {
-        player.positions = positions[player.accountId];
-        player.positions.unshift({
-            elapsedTime: 0,
-            location: {
-                x: player.location.x * ratio,
-                y: player.location.y * ratio,
-            },
-        });
-    }
-
-    // Load game states
-    let whiteCircle = [];
-    let safetyZone = [];
-    let redZone = [];
-
-    for (let log of logs.LogGameStatePeriodic) {
-        let gameState = log.gameState;
-
-        whiteCircle.push({
-            elapsedTime: log._elapsedTime,
-            position: {
-                x: gameState.poisonGasWarningPosition.x * ratio,
-                y: gameState.poisonGasWarningPosition.y * ratio,
-            },
-            radius: gameState.poisonGasWarningRadius * ratio,
-        });
-
-        safetyZone.push({
-            elapsedTime: log._elapsedTime,
-            position: {
-                x: gameState.safetyZonePosition.x * ratio,
-                y: gameState.safetyZonePosition.y * ratio,
-            },
-            radius: gameState.safetyZoneRadius * ratio,
-        });
-
-        redZone.push({
-            elapsedTime: log._elapsedTime,
-            position: {
-                x: gameState.redZonePosition.x * ratio,
-                y: gameState.redZonePosition.y * ratio,
-            },
-            radius: gameState.redZoneRadius * ratio,
-        });
-    }
-
-    let carePackages = logs.LogCarePackageSpawn.map(spawn => ({
-        spawnTime: spawn._elapsedTime,
-        location: {
-            x: spawn.itemPackage.location.x * ratio,
-            y: spawn.itemPackage.location.y * ratio,
-        },
-    }));
-
-    for (let i = 0; i < carePackages.length; i++)
-    {
-        let log = logs.LogCarePackageLand[i];
-
-        carePackages[i].landTime = log._elapsedTime;
-    }
-
-    return {
+    let data = {
         meta: {
-            terrain,
-            mapName,
+            mapName: null,
+            terrain: null,
         },
-        players,
-        whiteCircle,
-        safetyZone,
-        redZone,
-        carePackages,
+        players: {},
+        redZone: [],
+        whiteCircle: [],
+        safetyZone: [],
+        carePackages: [],
+        alivePlayers: [],
     };
+
+    for (let log of logs)
+    {
+        let type = log._T;
+        let logTime = getTime(log._D);
+        let elapsedTime = logTime - startTime;
+
+        // console.log(type, log);
+        switch (type)
+        {
+            case 'LogArmorDestroy': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                addPlayerInformation(log.victim, elapsedTime);
+                break;
+            }
+
+            case 'LogCarePackageLand': {
+                break;
+            }
+
+            case 'LogCarePackageSpawn': {
+                break;
+            }
+
+            case 'LogGameStatePeriodic': {
+                break;
+            }
+
+            case 'LogHeal': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemAttach': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemDetach': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemDrop': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemEquip': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemPickup': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemPickupFromCarepackage': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemPickupFromLootbox': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemUnequip': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogItemUse': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogMatchDefinition': {
+                break;
+            }
+
+            case 'LogMatchEnd': {
+                // TODO: update rank
+                for (let character of log.characters) {
+                    addPlayerInformation(character, elapsedTime);
+
+                    let player = getPlayer(character.accountId);
+
+                    player.name = character.name;
+                    player.teamId = character.teamId;
+                    player.ranking = character.ranking;
+                }
+
+                break;
+            }
+
+            case 'LogMatchStart': {
+                for (let character of log.characters) {
+                    addPlayerInformation(character, elapsedTime);
+                }
+
+                data.meta.terrain = log.mapName;
+                data.meta.mapName = mapNames[data.meta.terrain];
+                break;
+            }
+
+            case 'LogObjectDestroy': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogParachuteLanding': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogPlayerAttack': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                break;
+            }
+
+            case 'LogPlayerCreate': {
+                break;
+            }
+
+            case 'LogPlayerKill': {
+                if (isPlayer(log.killer)) {
+                    addPlayerInformation(log.killer, elapsedTime);
+                }
+
+                addPlayerInformation(log.victim, elapsedTime);
+
+                if (isPlayer(log.assistant)) {
+                    addPlayerInformation(log.assistant, elapsedTime);
+                }
+
+                break;
+            }
+
+            case 'LogPlayerLogin': {
+                break;
+            }
+
+            case 'LogPlayerLogout': {
+                break;
+            }
+
+            case 'LogPlayerMakeGroggy': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                addPlayerInformation(log.victim, elapsedTime);
+                break;
+            }
+
+            case 'LogPlayerPosition': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogPlayerRevive': {
+                addPlayerInformation(log.reviver, elapsedTime);
+
+                addPlayerInformation(log.victim, elapsedTime);
+                break;
+            }
+
+            case 'LogPlayerTakeDamage': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                addPlayerInformation(log.victim, elapsedTime);
+                break;
+            }
+
+            case 'LogRedZoneEnded': {
+                for (let driver of log.drivers) {
+                    addPlayerInformation(driver, elapsedTime);
+                }
+                break;
+            }
+
+            case 'LogSwimEnd': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogSwimStart': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogVaultStart': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogVehicleDestroy': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                break;
+            }
+
+            case 'LogVehicleLeave': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogVehicleRide': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogWeaponFireCount': {
+                addPlayerInformation(log.character, elapsedTime);
+                break;
+            }
+
+            case 'LogWheelDestroy': {
+                if (isPlayer(log.attacker)) {
+                    addPlayerInformation(log.attacker, elapsedTime);
+                }
+
+                break;
+            }
+        }
+    }
+
+    console.log(data);
+    return data;
 }
 
 function getTime(str) {
