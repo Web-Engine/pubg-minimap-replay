@@ -84,7 +84,7 @@ class Minimap extends utils.EventEmitter {
         let carePackageSprites = [];
 
         for (let carePackage of data.carePackages) {
-            let carePackageSprite = new CarePackage(carePackage);
+            let carePackageSprite = new CarePackage(this, carePackage);
             this.app.stage.addChild(carePackageSprite);
 
             carePackageSprites.push(carePackageSprite);
@@ -97,7 +97,7 @@ class Minimap extends utils.EventEmitter {
         });
     }
 
-    get zoomFactor() {
+    get zoom() {
         return this._zoomFactor;
     }
 
@@ -105,7 +105,7 @@ class Minimap extends utils.EventEmitter {
         return this._centerPosition;
     }
 
-    zoom(factor, position = null) {
+    setZoom(factor, position = null) {
         this._zoomFactor = factor;
 
         if (position) {

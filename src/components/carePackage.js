@@ -16,8 +16,8 @@ class CarePackage extends Sprite {
         this.anchor.x = 0.5;
         this.anchor.y = 0.5;
 
-        this.scale.x = 2 / minimap.zoomFactor;
-        this.scale.y = 2 / minimap.zoomFactor;
+        this.scale.x = 2 / minimap.zoom;
+        this.scale.y = 2 / minimap.zoom;
 
         this.spawnTime = data.spawnTime;
         this.landTime = data.landTime;

@@ -26,7 +26,7 @@ class SafetyZone extends Graphics {
 
         this.clear();
 
-        this.lineStyle(15 / this._minimap.zoomFactor, 0x3333FF, 1);
+        this.lineStyle(15 / this._minimap.zoom, 0x3333FF, 1);
         this.drawCircle(0, 0, value);
     }
 
