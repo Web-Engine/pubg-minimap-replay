@@ -34,11 +34,12 @@ class Minimap extends utils.EventEmitter {
 
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
 
-        this.currentTime = 0;
+        this._currentTime = 0;
+        this._speed = 10;
 
         // Increase time
         this.app.ticker.add(delta => {
-            this.currentTime += delta * window.speed;
+            this._currentTime += 1000 * delta / 60 * this.speed;
         });
 
         // Load background sprite
@@ -125,8 +126,22 @@ class Minimap extends utils.EventEmitter {
         this.app.renderer.resize(canvasSize, canvasSize);
         this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
     }
-}
 
-window.speed = 100;
+    get speed() {
+        return this._speed;
+    }
+
+    set speed(value) {
+        this._speed = value;
+    }
+
+    get currentTime() {
+        return this._currentTime;
+    }
+
+    set currentTime(value) {
+        this._currentTime = value;
+    }
+}
 
 export { Minimap };
