@@ -18,6 +18,7 @@
     "@babel/plugin-proposal-class-properties": "^7.5.0",
     "@babel/preset-env": "^7.5.4",
     "babel-loader": "^8.0.6",
+    "file-loader": "^4.1.0",
     "url-loader": "^2.0.1",
     "webpack": "^4.35.3",
     "webpack-cli": "^3.3.6"
