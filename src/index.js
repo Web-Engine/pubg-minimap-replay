@@ -97,6 +97,14 @@ class Minimap extends utils.EventEmitter {
         });
     }
 
+    play() {
+        this.app.start();
+    }
+
+    pause() {
+        this.app.stop();
+    }
+
     get zoom() {
         return this._zoomFactor;
     }
