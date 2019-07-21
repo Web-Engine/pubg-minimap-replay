@@ -16,7 +16,7 @@ class Minimap extends utils.EventEmitter {
     constructor(data) {
         super();
 
-        const sizeRatio = size / mapSize;
+        const sizeRatio = canvasSize / mapSize;
 
         data = normalizeData(data, sizeRatio);
 
@@ -35,7 +35,6 @@ class Minimap extends utils.EventEmitter {
         this.app = app;
 
         // Load background sprite
-
         const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
         const background = new Sprite(backgroundTexture);
         background.width = canvasSize;
@@ -58,8 +57,6 @@ class Minimap extends utils.EventEmitter {
         componentLayer.height = app.view.height;
         app.stage.addChild(componentLayer);
 
-        componentLayer.transform.scale.set(canvasSize / size, canvasSize / size);
-
         this._currentTime = 0;
         this._speed = 10;
 
@@ -73,7 +70,7 @@ class Minimap extends utils.EventEmitter {
         let playerContainer = new Container();
 
         for (let player of Object.values(data.players)) {
-            let playerComponent = new Player(this, player);
+            let playerComponent = new Player(player);
             players.push(playerComponent);
 
             playerContainer.addChild(playerComponent);
@@ -88,9 +85,9 @@ class Minimap extends utils.EventEmitter {
         });
 
         // Create circles
-        let whiteCircle = new WhiteCircle(this, data.whiteCircle);
-        let redZone = new RedZone(this, data.redZone);
-        let safetyZone = new SafetyZone(this, data.safetyZone);
+        let whiteCircle = new WhiteCircle(data.whiteCircle);
+        let redZone = new RedZone(data.redZone);
+        let safetyZone = new SafetyZone(data.safetyZone);
 
         componentLayer.addChild(whiteCircle);
         componentLayer.addChild(safetyZone);
@@ -107,7 +104,7 @@ class Minimap extends utils.EventEmitter {
         let carePackageSprites = [];
 
         for (let carePackage of data.carePackages) {
-            let carePackageSprite = new CarePackage(this, carePackage);
+            let carePackageSprite = new CarePackage(carePackage);
             carePackageSprites.push(carePackageSprite);
 
             carePackageContainer.addChild(carePackageSprite);
@@ -155,7 +152,7 @@ class Minimap extends utils.EventEmitter {
         }
 
         let canvasSize = this.app.renderer.width;
-        this.app.stage.transform.scale.set(canvasSize / size * factor, canvasSize / size * factor);
+        // this.app.stage.transform.scale.set(canvasSize / size * factor, canvasSize / size * factor);
 
         this.app.stage.transform.position.x = (this._centerPosition.x / size) * canvasSize - canvasSize * factor / 2;
         this.app.stage.transform.position.y = (this._centerPosition.y / size) * canvasSize - canvasSize * factor / 2;

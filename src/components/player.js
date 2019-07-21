@@ -2,10 +2,9 @@ import { Container, Text, Graphics } from 'pixi.js'
 import { findCurrentState } from "../utils";
 
 class Player extends Container {
-    constructor(minimap, data) {
+    constructor(data) {
         super();
 
-        this._minimap = minimap;
         this.data = data;
         this.name = data.name;
         this.accountId = data.accountId;
@@ -14,25 +13,15 @@ class Player extends Container {
         let backgroundCircle = new Graphics();
         this.addChild(backgroundCircle);
 
-        backgroundCircle.lineStyle(5);
+        backgroundCircle.lineStyle(1);
         backgroundCircle.beginFill(0xFFFFFF);
-        backgroundCircle.drawCircle(0, 0, 100);
+        backgroundCircle.drawCircle(0, 0, 10);
         backgroundCircle.endFill();
 
-        let text = new Text(String(data.teamId), { fontSize: 130 });
+        let text = new Text(String(data.teamId), { fontSize: 12 });
         text.anchor.set(0.5, 0.5);
 
         this.addChild(text);
-
-        minimap.on('zoomChange', factor => {
-            backgroundCircle.clear();
-            backgroundCircle.lineStyle(5 / factor);
-            backgroundCircle.beginFill(0xFFFFFF);
-            backgroundCircle.drawCircle(0, 0, 100 / factor);
-            backgroundCircle.endFill();
-
-            text.style = { fontSize: 130 / factor };
-        });
     }
 
     seek(time) {

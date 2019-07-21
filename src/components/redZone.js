@@ -2,10 +2,9 @@ import { Graphics } from 'pixi.js'
 import { findCurrentState } from "../utils";
 
 class RedZone extends Graphics {
-    constructor(minimap, data) {
+    constructor(data) {
         super();
 
-        this._minimap = minimap;
         this._data = data;
         this._radius = 0;
 

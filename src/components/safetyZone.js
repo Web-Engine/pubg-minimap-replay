@@ -2,19 +2,14 @@ import { Graphics } from 'pixi.js'
 import { findCurrentState } from "../utils";
 
 class SafetyZone extends Graphics {
-    constructor(minimap, data) {
+    constructor(data) {
         super();
 
-        this._minimap = minimap;
         this._data = data;
         this._radius = 0;
 
         this.lineStyle(15, 0x3333FF, 1);
         this.drawCircle(0, 0, 0);
-
-        minimap.on('zoomChange', () => {
-            this.radius = this.radius;
-        });
     }
 
     get radius() {
@@ -26,7 +21,7 @@ class SafetyZone extends Graphics {
 
         this.clear();
 
-        this.lineStyle(15 / this._minimap.zoom, 0x3333FF, 1);
+        this.lineStyle(2, 0x3333FF, 1);
         this.drawCircle(0, 0, value);
     }
 

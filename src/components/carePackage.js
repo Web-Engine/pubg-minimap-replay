@@ -5,10 +5,8 @@ const FlyingTexture = Texture.from(Icon.CarePackage.Flying);
 const NormalTexture = Texture.from(Icon.CarePackage.Normal);
 
 class CarePackage extends Sprite {
-    constructor(minimap, data) {
-        super(Texture.from(Icon.CarePackage.Flying));
-
-        this._minimap = minimap;
+    constructor(data) {
+        super(FlyingTexture);
 
         this.x = data.spawnLocation.x;
         this.y = data.spawnLocation.y;
@@ -16,16 +14,11 @@ class CarePackage extends Sprite {
         this.anchor.x = 0.5;
         this.anchor.y = 0.5;
 
-        this.scale.x = 2 / minimap.zoom;
-        this.scale.y = 2 / minimap.zoom;
+        this.scale.x = .2;
+        this.scale.y = .2;
 
         this.spawnTime = data.spawnTime;
         this.landTime = data.landTime;
-
-        minimap.on('zoomChange', factor => {
-            this.scale.x = 2 / factor;
-            this.scale.y = 2 / factor;
-        });
     }
 
     seek(time) {
