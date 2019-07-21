@@ -19,8 +19,8 @@ class Minimap extends utils.EventEmitter {
 
         data = normalizeData(data, 1 / mapSize);
 
-        this._zoomFactor = 1;
-        this._centerPosition = new Point(size / 2, size / 2);
+        this._zoom = 1;
+        this._center = new Point(.5, .5);
 
         this._data = data;
 
@@ -138,15 +138,15 @@ class Minimap extends utils.EventEmitter {
     }
 
     get zoom() {
-        return this._zoomFactor;
+        return this._zoom;
     }
 
-    get centerPosition() {
-        return this._centerPosition;
+    get center() {
+        return this._center;
     }
 
-    setZoom(factor, position = null) {
-        this._zoomFactor = factor;
+    set zoom(factor) {
+        this._zoom = factor;
 
         this.resize(this.app.renderer.width);
     }
@@ -154,13 +154,16 @@ class Minimap extends utils.EventEmitter {
     resize(canvasSize) {
         this.app.renderer.resize(canvasSize, canvasSize);
 
-        let factor = this._zoomFactor;
+        let factor = this._zoom;
 
         let background = this.background;
         background.width = canvasSize * factor;
         background.height = canvasSize * factor;
 
-        this.app.stage.position.set((background.width - canvasSize) / -2, (background.height - canvasSize) / -2);
+        let x = - background.width * this.center.x + canvasSize / 2;
+        let y = - background.height * this.center.y + canvasSize / 2;
+
+        this.app.stage.position.set(x, y);
         this.app.stage.size = canvasSize * factor;
     }
 
