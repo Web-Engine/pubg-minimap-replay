@@ -14,6 +14,8 @@ class CarePackage extends Component {
         let sprite = new Sprite(FlyingTexture);
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
+        this._sprite = sprite;
+
         this.addChild(sprite);
 
         this.scale.x = .2;
@@ -29,7 +31,7 @@ class CarePackage extends Component {
         this.position.set(this._data.spawnLocation.x * this.root.size, this._data.spawnLocation.y * this.root.size);
 
         this.visible = this.spawnTime <= time;
-        this.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
+        this._sprite.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
     }
 }
 
