@@ -10,8 +10,8 @@ class CarePackage extends Sprite {
 
         this._minimap = minimap;
 
-        this.x = data.location.x;
-        this.y = data.location.y;
+        this.x = data.spawnLocation.x;
+        this.y = data.spawnLocation.y;
 
         this.anchor.x = 0.5;
         this.anchor.y = 0.5;

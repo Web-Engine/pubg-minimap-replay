@@ -35,13 +35,13 @@ class SafetyZone extends Graphics {
         if (!before) return;
 
         if (!after) {
-            this.position.set(before.position.x, before.position.y);
+            this.position.set(before.location.x, before.location.y);
             this.radius = before.radius;
             return;
         }
 
-        let x = before.position.x * ratio + after.position.x * (1 - ratio);
-        let y = before.position.y * ratio + after.position.y * (1 - ratio);
+        let x = before.location.x * ratio + after.location.x * (1 - ratio);
+        let y = before.location.y * ratio + after.location.y * (1 - ratio);
         let radius = before.radius * ratio + after.radius * (1 - ratio);
 
         this.position.set(x, y);
