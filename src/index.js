@@ -59,6 +59,7 @@ class Minimap extends utils.EventEmitter {
         componentLayer.width = app.view.width;
         componentLayer.height = app.view.height;
         app.stage.addChild(componentLayer);
+        this.componentLayer = componentLayer;
 
         this._currentTime = 0;
         this._speed = 10;
@@ -163,7 +164,9 @@ class Minimap extends utils.EventEmitter {
         let x = - background.width * this.center.x + canvasSize / 2;
         let y = - background.height * this.center.y + canvasSize / 2;
 
-        this.app.stage.position.set(x, y);
+        this.componentLayer.position.set(x, y);
+        this.background.position.set(x, y);
+
         this.app.stage.size = canvasSize * factor;
     }
 
