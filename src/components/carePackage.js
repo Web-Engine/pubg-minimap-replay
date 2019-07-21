@@ -1,4 +1,4 @@
-import { Sprite, Texture } from 'pixi.js'
+import { Sprite, Texture } from 'pixi.js';
 import Component from './component';
 import { Icon } from './../assets';
 

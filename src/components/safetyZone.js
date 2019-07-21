@@ -1,6 +1,6 @@
-import { Graphics } from 'pixi.js'
+import { Graphics } from 'pixi.js';
 import Component from './component';
-import { findCurrentState } from "../utils";
+import { findCurrentState } from '../utils';
 
 class SafetyZone extends Component {
     constructor(data) {

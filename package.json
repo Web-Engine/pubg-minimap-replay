@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack -w"
+    "watch": "webpack -w",
+    "lint": "eslint ./src --fix"
   },
   "author": "",
   "license": "ISC",

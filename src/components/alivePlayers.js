@@ -1,5 +1,5 @@
-import { Container, Text, Graphics } from 'pixi.js'
-import { findCurrentState } from "../utils";
+import { Container, Text, Graphics } from 'pixi.js';
+import { findCurrentState } from '../utils';
 
 class AlivePlayerUI extends Container {
     constructor(data) {

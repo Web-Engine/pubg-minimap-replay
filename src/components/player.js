@@ -1,5 +1,5 @@
-import { Container, Text, Graphics } from 'pixi.js'
-import { findCurrentState } from "../utils";
+import { Text, Graphics } from 'pixi.js';
+import { findCurrentState } from '../utils';
 import Component from './component';
 
 class Player extends Component {

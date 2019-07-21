@@ -1,11 +1,11 @@
 import { Application, Texture, Sprite, Point, utils, Container } from 'pixi.js';
-import Player from './components/player'
+import Player from './components/player';
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
 import { normalizeData } from './utils';
-import AlivePlayerUI from "./components/alivePlayers";
+import AlivePlayerUI from './components/alivePlayers';
 import { Background } from './assets';
 
 const canvasSize = 819;
