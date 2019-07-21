@@ -34,7 +34,7 @@ class WhiteCircle extends Graphics {
         let { before } = findCurrentState(this._data, time);
         if (!before) return;
 
-        this.position.set(before.position.x, before.position.y);
+        this.position.set(before.location.x, before.location.y);
         this.radius = before.radius;
     }
 }

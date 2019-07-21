@@ -164,10 +164,14 @@ const mapNames = {
     Savage_Main: "Sanhok"
 };
 
-function last(array) {
-    if (array.length === 0) return null;
+function back(array, index) {
+    if (array.length <= index) return null;
 
-    return array[array.length - 1];
+    return array[array.length - index - 1];
+}
+
+function last(array) {
+    return back(array, 0);
 }
 
 function isLocationEqual(a, b) {
@@ -177,7 +181,25 @@ function isLocationEqual(a, b) {
     return a.x === b.x && a.y === b.y;
 }
 
+function isCircleEqual(a, b) {
+    if (a === b) return true;
+    if (!a || !b) return false;
+
+    return isLocationEqual(a.location, b.location) && a.radius === b.radius;
+}
+
 function normalizeData(logs, ratio) {
+    function normalizeNumber(number) {
+        return number * ratio;
+    }
+
+    function normalizeLocation(location) {
+        return {
+            x: location.x * ratio,
+            y: location.y * ratio,
+        };
+    }
+
     function isPlayer(character) {
         return character && character.accountId;
     }
@@ -213,7 +235,7 @@ function normalizeData(logs, ratio) {
         let { x, y } = character.location;
 
         player.locations.push({
-            location: { x, y },
+            location: normalizeLocation({ x, y }),
             elapsedTime,
         });
     }
@@ -226,6 +248,63 @@ function normalizeData(logs, ratio) {
 
         player.healths.push({
             health: character.health,
+            elapsedTime,
+        });
+    }
+
+    function addWhiteCircle({ x, y }, radius, elapsedTime) {
+        let lastWhiteCircle = last(data.whiteCircle);
+
+        let circle = {
+            location: normalizeLocation({ x, y, }),
+            radius: normalizeNumber(radius),
+        };
+
+        if (isCircleEqual(lastWhiteCircle, circle)) {
+            return;
+        }
+
+        data.whiteCircle.push({
+            ...circle,
+            elapsedTime,
+        });
+    }
+
+    function addSafetyZone({ x, y }, radius, elapsedTime) {
+        let beforeLast = back(data.safetyZone, 1);
+
+        if (beforeLast && beforeLast.radius === radius) {
+            return;
+        }
+
+        data.safetyZone.push({
+            location: normalizeLocation({ x, y }),
+            radius: normalizeNumber(radius),
+            elapsedTime,
+        });
+    }
+
+    function addRedZone({ x, y }, radius, elapsedTime) {
+        let lastRedZone = last(data.redZone);
+
+        let circle = {
+            location: normalizeLocation({ x, y, }),
+            radius: normalizeNumber(radius),
+        };
+
+        if (isCircleEqual(lastRedZone, circle)) {
+            return;
+        }
+
+        data.redZone.push({
+            ...circle,
+            elapsedTime,
+        });
+    }
+
+    function addAlivePlayers(numAlivePlayers, elapsedTime) {
+        data.alivePlayers.push({
+            numAlivePlayers,
             elapsedTime,
         });
     }
@@ -265,6 +344,8 @@ function normalizeData(logs, ratio) {
 
     let startTime = getTime(matchStart._D);
 
+    let carePackageLandIndex = 0;
+
     for (let log of logs)
     {
         let type = log._T;
@@ -284,14 +365,46 @@ function normalizeData(logs, ratio) {
             }
 
             case 'LogCarePackageLand': {
+                let itemPackage = log.itemPackage;
+
+                let landLocation = {
+                    x: itemPackage.location.x,
+                    y: itemPackage.location.y,
+                };
+
+                data.carePackages[carePackageLandIndex].landLocation = normalizeLocation(landLocation);
+                data.carePackages[carePackageLandIndex].landTime = elapsedTime;
+                carePackageLandIndex++;
                 break;
             }
 
             case 'LogCarePackageSpawn': {
+                let itemPackage = log.itemPackage;
+
+                let spawnLocation = {
+                    x: itemPackage.location.x,
+                    y: itemPackage.location.y,
+                };
+
+                data.carePackages.push({
+                    spawnTime: elapsedTime,
+                    spawnLocation: normalizeLocation(spawnLocation),
+
+                    landTime: null,
+                    landLocation: null,
+                });
+
                 break;
             }
 
             case 'LogGameStatePeriodic': {
+                let gameState = log.gameState;
+
+                addWhiteCircle(gameState.poisonGasWarningPosition, gameState.poisonGasWarningRadius, elapsedTime);
+                addSafetyZone(gameState.safetyZonePosition, gameState.safetyZoneRadius, elapsedTime);
+                addRedZone(gameState.redZonePosition, gameState.redZoneRadius, elapsedTime);
+                addAlivePlayers(gameState.numAlivePlayers, elapsedTime);
+
                 break;
             }
 
@@ -352,8 +465,6 @@ function normalizeData(logs, ratio) {
             case 'LogMatchEnd': {
                 // TODO: update rank
                 for (let character of log.characters) {
-                    addPlayerInformation(character, elapsedTime);
-
                     let player = getPlayer(character.accountId);
 
                     player.name = character.name;
@@ -423,6 +534,7 @@ function normalizeData(logs, ratio) {
 
             case 'LogPlayerPosition': {
                 addPlayerInformation(log.character, elapsedTime);
+                addAlivePlayers(log.numAlivePlayers, elapsedTime);
                 break;
             }
 
