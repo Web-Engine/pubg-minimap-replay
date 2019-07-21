@@ -1,7 +1,8 @@
 import { Container, Text, Graphics } from 'pixi.js'
 import { findCurrentState } from "../utils";
+import Component from './component';
 
-class Player extends Container {
+class Player extends Component {
     constructor(data) {
         super();
 
@@ -25,6 +26,8 @@ class Player extends Container {
     }
 
     seek(time) {
+        if (!this.root) return;
+
         let { before, after, ratio } = findCurrentState(this.locations, time);
 
         if (!before) {
@@ -34,15 +37,15 @@ class Player extends Container {
         }
 
         if (!after) {
-            this.x = before.location.x;
-            this.y = before.location.y;
+            this.x = before.location.x * this.root.size;
+            this.y = before.location.y * this.root.size;
             return;
         }
 
         let x = before.location.x * ratio + after.location.x * (1 - ratio);
         let y = before.location.y * ratio + after.location.y * (1 - ratio);
 
-        this.position.set(x, y);
+        this.position.set(x * this.root.size, y * this.root.size);
     }
 }
 

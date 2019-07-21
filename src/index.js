@@ -1,10 +1,11 @@
 import { Application, Texture, Sprite, Point, utils, Container } from 'pixi.js';
+import * as PIXI from 'pixi.js'
 import Player from './components/player'
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
-import {findCurrentState, normalizeData} from './utils';
+import { findCurrentState, normalizeData } from './utils';
 import AlivePlayerUI from "./components/alivePlavers";
 import { Background } from './assets';
 
@@ -16,9 +17,7 @@ class Minimap extends utils.EventEmitter {
     constructor(data) {
         super();
 
-        const sizeRatio = canvasSize / mapSize;
-
-        data = normalizeData(data, sizeRatio);
+        data = normalizeData(data, 1 / mapSize);
 
         this._zoomFactor = 1;
         this._centerPosition = new Point(size / 2, size / 2);
@@ -33,6 +32,10 @@ class Minimap extends utils.EventEmitter {
         });
 
         this.app = app;
+
+        app.stage.width = canvasSize;
+        app.stage.height = canvasSize;
+        app.stage.size = canvasSize;
 
         // Load background sprite
         const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
@@ -68,6 +71,7 @@ class Minimap extends utils.EventEmitter {
         // Add players
         let players = [];
         let playerContainer = new Container();
+        componentLayer.addChild(playerContainer);
 
         for (let player of Object.values(data.players)) {
             let playerComponent = new Player(player);
@@ -75,8 +79,6 @@ class Minimap extends utils.EventEmitter {
 
             playerContainer.addChild(playerComponent);
         }
-
-        componentLayer.addChild(playerContainer);
 
         this.app.ticker.add(() => {
             for (let player of players) {
@@ -101,16 +103,15 @@ class Minimap extends utils.EventEmitter {
 
         // Create care packages
         let carePackageContainer = new Container();
-        let carePackageSprites = [];
+        componentLayer.addChild(carePackageContainer);
 
+        let carePackageSprites = [];
         for (let carePackage of data.carePackages) {
             let carePackageSprite = new CarePackage(carePackage);
             carePackageSprites.push(carePackageSprite);
 
             carePackageContainer.addChild(carePackageSprite);
         }
-
-        componentLayer.addChild(carePackageContainer);
 
         this.app.ticker.add(() => {
             for (let carePackage of carePackageSprites) {
@@ -145,19 +146,25 @@ class Minimap extends utils.EventEmitter {
     }
 
     setZoom(factor, position = null) {
-        this._zoomFactor = factor;
+        let background = this.background;
+        background.width = canvasSize * factor;
+        background.height = canvasSize * factor;
+        background.position.set((background.width - canvasSize) / -2, (background.height - canvasSize) / -2);
 
-        if (position) {
-            this._centerPosition = position;
-        }
+        let data = this.data;
 
-        let canvasSize = this.app.renderer.width;
-        // this.app.stage.transform.scale.set(canvasSize / size * factor, canvasSize / size * factor);
-
-        this.app.stage.transform.position.x = (this._centerPosition.x / size) * canvasSize - canvasSize * factor / 2;
-        this.app.stage.transform.position.y = (this._centerPosition.y / size) * canvasSize - canvasSize * factor / 2;
-
-        this.emit('zoomChange', factor, position);
+        // this._zoomFactor = factor;
+        //
+        // if (position) {
+        //     this._centerPosition = position;
+        // }
+        //
+        // let canvasSize = this.app.renderer.width;
+        //
+        // this.app.stage.transform.position.x = (this._centerPosition.x / size) * canvasSize - canvasSize * factor / 2;
+        // this.app.stage.transform.position.y = (this._centerPosition.y / size) * canvasSize - canvasSize * factor / 2;
+        //
+        // this.emit('zoomChange', factor, position);
     }
 
     resize(canvasSize) {
