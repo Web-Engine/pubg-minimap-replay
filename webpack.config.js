@@ -18,7 +18,10 @@ module.exports = {
                 exclude: /node_modules/,
                 use: [
                     {
-                        loader: 'url-loader',
+                        loader: 'file-loader',
+                        options: {
+                            publicPath: '../dist',
+                        },
                     },
                 ],
             },
