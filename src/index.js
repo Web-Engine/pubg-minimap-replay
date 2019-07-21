@@ -1,11 +1,11 @@
-import { Application, Texture, Sprite, Point, utils } from 'pixi.js';
+import { Application, Texture, Sprite, Point, utils, Container } from 'pixi.js';
 import Player from './components/player'
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
 import {findCurrentState, normalizeData} from './utils';
-import { NumAlivePlayers, AlivePlayersText } from "./components/alivePlavers";
+import AlivePlayerUI from "./components/alivePlavers";
 import { Background } from './assets';
 
 const canvasSize = 819;
@@ -26,41 +26,63 @@ class Minimap extends utils.EventEmitter {
         this._data = data;
 
         // Create pixi application
-        this.app = new Application({
+        let app = new Application({
             width: canvasSize,
             height: canvasSize,
             antialias: true,
         });
 
-        this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
+        this.app = app;
+
+        // Load background sprite
+
+        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
+        const background = new Sprite(backgroundTexture);
+        background.width = canvasSize;
+        background.height = canvasSize;
+        app.stage.addChild(background);
+
+        this.background = background;
+
+        // Add ui layer
+        let uiLayer = new Container();
+        uiLayer.width = app.view.width;
+        uiLayer.height = app.view.height;
+        app.stage.addChild(uiLayer);
+
+        this.uiLayer = uiLayer;
+
+        // add component layer
+        let componentLayer = new Container();
+        componentLayer.width = app.view.width;
+        componentLayer.height = app.view.height;
+        app.stage.addChild(componentLayer);
+
+        componentLayer.transform.scale.set(canvasSize / size, canvasSize / size);
 
         this._currentTime = 0;
         this._speed = 10;
 
         // Increase time
-        this.app.ticker.add(delta => {
+        app.ticker.add(delta => {
             this._currentTime += 1000 * delta / 60 * this.speed;
         });
 
-        // Load background sprite
-        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
-        const background = new Sprite(backgroundTexture);
-        background.width = size;
-        background.height = size;
-        this.app.stage.addChild(background);
-
-        // Create players
-        let playerSprites = [];
+        // Add players
+        let players = [];
+        let playerContainer = new Container();
 
         for (let player of Object.values(data.players)) {
-            let playerSprite = new Player(this, player);
-            this.app.stage.addChild(playerSprite);
+            let playerComponent = new Player(this, player);
+            players.push(playerComponent);
 
-            playerSprites.push(playerSprite);
+            playerContainer.addChild(playerComponent);
         }
 
+        componentLayer.addChild(playerContainer);
+
         this.app.ticker.add(() => {
-            for (let player of playerSprites) {
+            for (let player of players) {
                 player.seek(this.currentTime);
             }
         });
@@ -70,9 +92,9 @@ class Minimap extends utils.EventEmitter {
         let redZone = new RedZone(this, data.redZone);
         let safetyZone = new SafetyZone(this, data.safetyZone);
 
-        this.app.stage.addChild(whiteCircle);
-        this.app.stage.addChild(safetyZone);
-        this.app.stage.addChild(redZone);
+        componentLayer.addChild(whiteCircle);
+        componentLayer.addChild(safetyZone);
+        componentLayer.addChild(redZone);
 
         this.app.ticker.add(() => {
             whiteCircle.seek(this.currentTime);
@@ -81,14 +103,17 @@ class Minimap extends utils.EventEmitter {
         });
 
         // Create care packages
+        let carePackageContainer = new Container();
         let carePackageSprites = [];
 
         for (let carePackage of data.carePackages) {
             let carePackageSprite = new CarePackage(this, carePackage);
-            this.app.stage.addChild(carePackageSprite);
-
             carePackageSprites.push(carePackageSprite);
+
+            carePackageContainer.addChild(carePackageSprite);
         }
+
+        componentLayer.addChild(carePackageContainer);
 
         this.app.ticker.add(() => {
             for (let carePackage of carePackageSprites) {
@@ -96,15 +121,14 @@ class Minimap extends utils.EventEmitter {
             }
         });
 
-        let numAlivePlayers = new NumAlivePlayers(data.alivePlayers);
-        let alivePlayersText = new AlivePlayersText();
+        let alivePlayerUI = new AlivePlayerUI(data.alivePlayers);
+        alivePlayerUI.position.set(20, 20);
 
-        this.app.stage.addChild(numAlivePlayers);
-        this.app.stage.addChild(alivePlayersText);
+        uiLayer.addChild(alivePlayerUI);
 
         this.app.ticker.add(() => {
-            numAlivePlayers.seek(this.currentTime);
-        })
+            alivePlayerUI.seek(this.currentTime);
+        });
     }
 
     play() {
@@ -141,7 +165,8 @@ class Minimap extends utils.EventEmitter {
 
     resize(canvasSize) {
         this.app.renderer.resize(canvasSize, canvasSize);
-        this.app.stage.transform.scale.set(canvasSize / size, canvasSize / size);
+        this.background.width = canvasSize;
+        this.background.height = canvasSize;
     }
 
     get speed() {
