@@ -146,31 +146,22 @@ class Minimap extends utils.EventEmitter {
     }
 
     setZoom(factor, position = null) {
-        let background = this.background;
-        background.width = canvasSize * factor;
-        background.height = canvasSize * factor;
-        background.position.set((background.width - canvasSize) / -2, (background.height - canvasSize) / -2);
+        this._zoomFactor = factor;
 
-        let data = this.data;
-
-        // this._zoomFactor = factor;
-        //
-        // if (position) {
-        //     this._centerPosition = position;
-        // }
-        //
-        // let canvasSize = this.app.renderer.width;
-        //
-        // this.app.stage.transform.position.x = (this._centerPosition.x / size) * canvasSize - canvasSize * factor / 2;
-        // this.app.stage.transform.position.y = (this._centerPosition.y / size) * canvasSize - canvasSize * factor / 2;
-        //
-        // this.emit('zoomChange', factor, position);
+        this.resize(this.app.renderer.width);
     }
 
     resize(canvasSize) {
         this.app.renderer.resize(canvasSize, canvasSize);
-        this.background.width = canvasSize;
-        this.background.height = canvasSize;
+
+        let factor = this._zoomFactor;
+
+        let background = this.background;
+        background.width = canvasSize * factor;
+        background.height = canvasSize * factor;
+
+        this.app.stage.position.set((background.width - canvasSize) / -2, (background.height - canvasSize) / -2);
+        this.app.stage.size = canvasSize * factor;
     }
 
     get speed() {
