@@ -15,7 +15,7 @@ class RedZone extends Component {
         circle.endFill();
 
         this._circle = circle;
-        
+
         this.addChild(circle);
     }
 

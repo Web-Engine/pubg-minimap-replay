@@ -1,33 +1,87 @@
 module.exports = {
     'env': {
         'browser': true,
-        'es6': true
+        'es6': true,
     },
     'extends': 'eslint:recommended',
     'globals': {
         'Atomics': 'readonly',
-        'SharedArrayBuffer': 'readonly'
+        'SharedArrayBuffer': 'readonly',
     },
     'parserOptions': {
         'ecmaVersion': 2018,
-        'sourceType': 'module'
+        'sourceType': 'module',
     },
     'rules': {
-        'indent': [
+        'indent': [ 'error', 4 ],
+        'linebreak-style': [ 'error', 'unix' ],
+        'quotes': [ 'error', 'single' ],
+        'semi': [ 'error', 'always' ],
+        'array-bracket-newline': [ 'error', 'consistent' ],
+        'array-bracket-spacing': [ 'error', 'always' ],
+        'array-element-newline': [ 'error', 'consistent' ],
+        'block-spacing': [ 'error', 'always' ],
+        'brace-style': [ 'error', 'stroustrup' ],
+        'capitalized-comments': [
             'error',
-            4
+            'always',
+            {
+                ignoreInlineComments: true,
+                ignoreConsecutiveComments: true,
+            },
         ],
-        'linebreak-style': [
+        'comma-dangle': [
             'error',
-            'unix'
+            {
+                'arrays': 'always-multiline',
+                'objects': 'always-multiline',
+                'imports': 'always-multiline',
+                'exports': 'always-multiline',
+                'functions': 'never',
+            },
         ],
-        'quotes': [
+        'comma-spacing': [ 'error', { before: false, after: true } ],
+        'comma-style': [ 'error', 'last' ],
+        'computed-property-spacing': [ 'error', 'never' ],
+        'consistent-this': [ 'error', 'self' ],
+        'eol-last': [ 'error', 'always' ],
+        'func-call-spacing': [ 'error', 'never' ],
+        'key-spacing': [ 'error', { beforeColon: false, afterColon: true, mode: 'strict' } ],
+        'keyword-spacing': [ 'error', { before: true, after: true } ],
+        'lines-around-comment': [
             'error',
-            'single'
+            {
+                'beforeBlockComment': true,
+                'afterBlockComment': false,
+                "beforeLineComment": true,
+                "afterLineComment": false,
+                "allowBlockStart": true,
+                "allowBlockEnd": true,
+                "allowObjectStart": true,
+                "allowObjectEnd": true,
+                "allowArrayStart": true,
+                "allowArrayEnd": true,
+                "allowClassStart": true,
+                "allowClassEnd": true,
+            },
         ],
-        'semi': [
-            'error',
-            'always'
-        ]
+        'lines-between-class-members': [ 'error', 'always' ],
+        'new-parens': [ 'error', 'always'],
+        'no-array-constructor': 'error',
+        'no-lonely-if': 'error',
+        'no-multiple-empty-lines': 'error',
+        'no-new-object': 'error',
+        'no-trailing-spaces': 'error',
+        'no-whitespace-before-property': 'error',
+        'nonblock-statement-body-position': [ 'error', 'beside' ],
+        'object-curly-newline': [ 'error', { 'multiline': true }],
+        'object-curly-spacing': [ 'error', 'always' ],
+        'padded-blocks': [ 'error', 'never' ],
+        'space-before-blocks': [ 'error', 'always' ],
+        'space-before-function-paren': [ 'error', 'never' ],
+        'space-in-parens': [ 'error' , 'never' ],
+        'space-infix-ops': 'error',
+        'space-unary-ops': 'error',
+        'spaced-comment': [ 'error', 'always' ],
     }
 };

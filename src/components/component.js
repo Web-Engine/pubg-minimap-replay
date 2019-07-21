@@ -20,7 +20,6 @@ class Component extends Container {
             root.on('added', onRootChange);
 
             this.root = root;
-
         };
 
         this.on('added', onRootChange);

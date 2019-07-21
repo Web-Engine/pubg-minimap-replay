@@ -2,8 +2,7 @@ function findCurrentState(array, time) {
     let left = 0;
     let right = array.length - 1;
 
-    while (left <= right)
-    {
+    while (left <= right) {
         let mid = Math.floor((left + right) / 2);
 
         if (array[mid].elapsedTime === time) {
@@ -36,8 +35,7 @@ function findCurrentState(array, time) {
 }
 
 
-
-// normalized data should be formatted like:
+// Normalized data should be formatted like:
 // {
 //     let string = '';
 //     let number = 1.234;
@@ -139,7 +137,7 @@ const mapNames = {
     DihorOtok_Main: 'Vikendi',
     Erangel_Main: 'Erangel',
     Range_Main: 'Camp_Jackal',
-    Savage_Main: 'Sanhok'
+    Savage_Main: 'Sanhok',
 };
 
 function back(array, index) {
@@ -234,7 +232,7 @@ function normalizeData(logs, ratio) {
         let lastWhiteCircle = last(data.whiteCircle);
 
         let circle = {
-            location: normalizeLocation({ x, y, }),
+            location: normalizeLocation({ x, y }),
             radius: normalizeNumber(radius),
         };
 
@@ -266,7 +264,7 @@ function normalizeData(logs, ratio) {
         let lastRedZone = last(data.redZone);
 
         let circle = {
-            location: normalizeLocation({ x, y, }),
+            location: normalizeLocation({ x, y }),
             radius: normalizeNumber(radius),
         };
 
@@ -289,8 +287,7 @@ function normalizeData(logs, ratio) {
 
     {
         let i;
-        for (i = 0; i < logs.length; i++)
-        {
+        for (i = 0; i < logs.length; i++) {
             if (logs[i]._T === 'LogMatchStart') break;
         }
 
@@ -324,14 +321,12 @@ function normalizeData(logs, ratio) {
 
     let carePackageLandIndex = 0;
 
-    for (let log of logs)
-    {
+    for (let log of logs) {
         let type = log._T;
         let logTime = getTime(log._D);
         let elapsedTime = logTime - startTime;
 
-        switch (type)
-        {
+        switch (type) {
         case 'LogArmorDestroy': {
             if (isPlayer(log.attacker)) {
                 addPlayerInformation(log.attacker, elapsedTime);
@@ -452,6 +447,7 @@ function normalizeData(logs, ratio) {
             break;
         }
 
+        // Already handle LogMatchStart
         // case 'LogMatchStart': {
         //     break;
         // }

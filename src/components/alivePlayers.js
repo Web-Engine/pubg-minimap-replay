@@ -42,7 +42,7 @@ class AlivePlayerUI extends Container {
     }
 
     seek(time) {
-        let { before, } = findCurrentState(this._data, time);
+        let { before } = findCurrentState(this._data, time);
         if (!before) return;
 
         this.numAlivePlayerText.text = before.numAlivePlayers;
