@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
+    <style>
+        body { margin: 0; }
+    </style>
 </head>
 <body>
 
@@ -12,7 +16,9 @@
     function onDataLoad(data) {
         window.data = data;
 
-        replayer = new Replay.Minimap(data);
+        window.replayer = new Replay.Minimap(data, {
+            size: 800,
+        });
 
         document.body.appendChild(replayer.app.view);
     }
