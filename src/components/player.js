@@ -62,40 +62,41 @@ class Player extends Component {
     }
 
     seek(time) {
-        {
-            let { before, after, ratio } = findCurrentState(this.locations, time);
+        this.updatePosition(time);
+        this.updateHealth(time);
+    }
 
-            if (!before) {
-                this.x = -1000;
-                this.y = -1000;
-                return;
-            }
+    updatePosition(time) {
+        let { before, after, ratio } = findCurrentState(this.locations, time);
 
-            if (!after) {
-                let { x, y } = this.toScaledPoint(before.location);
-                this.position.set(x, y);
+        if (!before) {
+            this.x = -1000;
+            this.y = -1000;
+            return;
+        }
 
-                return;
-            }
-
-            let location = calcPointRatio(before.location, after.location, ratio);
-            let { x, y } = this.toScaledPoint(location);
-
+        if (!after) {
+            let { x, y } = this.toScaledPoint(before.location);
             this.position.set(x, y);
+
+            return;
         }
 
-        {
-            let { before } = findCurrentState(this.healths, time);
+        let location = calcPointRatio(before.location, after.location, ratio);
+        let { x, y } = this.toScaledPoint(location);
 
-            let health = 100;
-            if (before) {
-                health = before.health;
-            }
+        this.position.set(x, y);
+    }
 
-            if (this.health === health) return;
+    updateHealth(time) {
+        let { before } = findCurrentState(this.healths, time);
 
-            this.health = health;
+        let health = 100;
+        if (before) {
+            health = before.health;
         }
+
+        this.health = health;
     }
 }
 
