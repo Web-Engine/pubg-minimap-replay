@@ -14,122 +14,82 @@ const canvasSize = 819;
 const mapSize = 400000;
 
 class Minimap extends utils.EventEmitter {
-    constructor(data) {
+    constructor(data, options = {}) {
         super();
 
-        data = normalizeData(data, 1 / mapSize);
+        this._initializeData(data);
+        this._initializeOptions(options);
+        this._initializeProperties();
+        this._initializePIXI();
+        this._initializeComponents();
+        this._initializeUI();
+        this._initializeEvents();
+        this._initializeTimer();
+    }
 
+    // region Initialize
+    _initializeData(data) {
+        this.data = normalizeData(data, 1 / mapSize);
+    }
+
+    _initializeOptions(options) {
+        options.size = options.size || 800;
+
+        this.options = options;
+    }
+
+    _initializeProperties() {
         this._zoom = 1;
+
         this._center = new ObservablePoint(.5, .5);
+        this._center.on('change', () => {
+            this._invalidate();
+        });
 
-        this._data = data;
+        this._currentTime = 0;
+        this._speed = 10;
+    }
 
+    _initializePIXI() {
         // Create pixi application
         let app = new Application({
-            width: canvasSize,
-            height: canvasSize,
+            width: this.options.size,
+            height: this.options.size,
             antialias: true,
         });
 
         this.app = app;
 
-        app.stage.width = canvasSize;
-        app.stage.height = canvasSize;
-        app.stage.size = canvasSize;
+        app.stage.size = this.options.size;
+    }
 
-        // Add component layer
-        let componentLayer = new Container();
-        componentLayer.width = app.view.width;
-        componentLayer.height = app.view.height;
-        app.stage.addChild(componentLayer);
-        this.componentLayer = componentLayer;
-
-        // Load background sprite
-        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
-        const background = new Sprite(backgroundTexture);
-        background.width = canvasSize;
-        background.height = canvasSize;
-        this.background = background;
-        componentLayer.addChild(background);
-
+    _initializeUI() {
         // Add ui layer
         let uiLayer = new Container();
-        uiLayer.width = app.view.width;
-        uiLayer.height = app.view.height;
-        app.stage.addChild(uiLayer);
-
         this.uiLayer = uiLayer;
 
-        this._currentTime = 0;
-        this._speed = 10;
+        this.app.stage.addChild(uiLayer);
 
-        // Increase time
-        app.ticker.add(delta => {
-            this._currentTime += 1000 * delta / 60 * this.speed;
-        });
+        this._initializeAlivePlayersUI();
+        this._initializeZoomControllerUI();
+    }
 
-        // Add players
-        let players = [];
-        let playerContainer = new Container();
-        componentLayer.addChild(playerContainer);
-
-        for (let player of Object.values(data.players)) {
-            let playerComponent = new Player(player);
-            players.push(playerComponent);
-
-            playerContainer.addChild(playerComponent);
-        }
-
-        app.ticker.add(() => {
-            for (let player of players) {
-                player.seek(this.currentTime);
-            }
-        });
-
-        // Create circles
-        let whiteCircle = new WhiteCircle(data.whiteCircle);
-        let redZone = new RedZone(data.redZone);
-        let safetyZone = new SafetyZone(data.safetyZone);
-
-        componentLayer.addChild(whiteCircle);
-        componentLayer.addChild(safetyZone);
-        componentLayer.addChild(redZone);
-
-        app.ticker.add(() => {
-            whiteCircle.seek(this.currentTime);
-            redZone.seek(this.currentTime);
-            safetyZone.seek(this.currentTime);
-        });
-
-        // Create care packages
-        let carePackageContainer = new Container();
-        componentLayer.addChild(carePackageContainer);
-
-        let carePackageSprites = [];
-        for (let carePackage of data.carePackages) {
-            let carePackageSprite = new CarePackage(carePackage);
-            carePackageSprites.push(carePackageSprite);
-
-            carePackageContainer.addChild(carePackageSprite);
-        }
-
-        app.ticker.add(() => {
-            for (let carePackage of carePackageSprites) {
-                carePackage.seek(this.currentTime);
-            }
-        });
-
-        let alivePlayers = new AlivePlayersUI(data.alivePlayers);
+    _initializeAlivePlayersUI() {
+        let alivePlayers = new AlivePlayersUI(this.data.alivePlayers);
         alivePlayers.position.set(20, 20);
 
-        uiLayer.addChild(alivePlayers);
+        this.uiLayer.addChild(alivePlayers);
 
-        app.ticker.add(() => {
+        this.app.ticker.add(() => {
             alivePlayers.seek(this.currentTime);
         });
+    }
+
+    _initializeZoomControllerUI() {
+        let renderer = this.app.renderer;
 
         let zoomController = new ZoomControllerUI();
-        zoomController.position.set(app.renderer.width - zoomController.width - 20, app.renderer.height - zoomController.height - 20);
+        zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
 
         zoomController.on('expand', () => {
             let zoom = this.zoom + 1;
@@ -150,15 +110,99 @@ class Minimap extends utils.EventEmitter {
         });
 
         this.on('resized', () => {
-            zoomController.position.set(app.renderer.width - zoomController.width - 20, app.renderer.height - zoomController.height - 20);
+            zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
         });
 
-        uiLayer.addChild(zoomController);
+        this.uiLayer.addChild(zoomController);
+    }
 
+    _initializeComponents() {
+        let componentLayer = new Container();
+        this.componentLayer = componentLayer;
+
+        this.app.stage.addChild(componentLayer);
+
+        this._initializeBackground();
+        this._initializeCircles();
+        this._initializePlayers();
+        this._initializeCarePackages();
+    }
+
+    _initializeBackground() {
+        const background = new Sprite(Texture.from(Background[this.data.meta.mapName].low));
+        this.background = background;
+
+        background.width = this.app.renderer.width;
+        background.height = this.app.renderer.height;
+
+        this.componentLayer.addChild(background);
+    }
+
+    _initializeCircles() {
+        let whiteCircle = new WhiteCircle(this.data.whiteCircle);
+        let redZone = new RedZone(this.data.redZone);
+        let safetyZone = new SafetyZone(this.data.safetyZone);
+
+        this.componentLayer.addChild(whiteCircle);
+        this.componentLayer.addChild(safetyZone);
+        this.componentLayer.addChild(redZone);
+
+        this.app.ticker.add(() => {
+            whiteCircle.seek(this.currentTime);
+            redZone.seek(this.currentTime);
+            safetyZone.seek(this.currentTime);
+        });
+    }
+
+    _initializePlayers() {
+        let players = [];
+
+        let playersContainer = new Container();
+        this.componentLayer.addChild(playersContainer);
+
+        for (let playerData of Object.values(this.data.players)) {
+            let player = new Player(playerData);
+            players.push(player);
+
+            playersContainer.addChild(player);
+        }
+
+        this.app.ticker.add(() => {
+            for (let player of players) {
+                player.seek(this.currentTime);
+            }
+        });
+    }
+
+    _initializeCarePackages() {
+        // Create care packages
+        let carePackagesContainer = new Container();
+        this.componentLayer.addChild(carePackagesContainer);
+
+        let carePackages = [];
+        for (let carePackageData of this.data.carePackages) {
+            let carePackage = new CarePackage(carePackageData);
+            carePackages.push(carePackage);
+
+            carePackagesContainer.addChild(carePackage);
+        }
+
+        this.app.ticker.add(() => {
+            for (let carePackage of carePackages) {
+                carePackage.seek(this.currentTime);
+            }
+        });
+    }
+
+    _initializeEvents() {
+        this._initializeMouseMove();
+    }
+
+    _initializeMouseMove() {
         let componentPosition = null;
         let startMousePosition = null;
 
-        background.interactive = true;
+        this.app.stage.interactive = true;
 
         let move = e => {
             let { x: mouseX, y: mouseY } = e.data.global;
@@ -169,8 +213,8 @@ class Minimap extends utils.EventEmitter {
             let x = componentPosition.x + diffX;
             let y = componentPosition.y + diffY;
 
-            let minX = app.renderer.width - app.stage.size;
-            let minY = app.renderer.width - app.stage.size;
+            let minX = this.app.renderer.width - this.app.stage.size;
+            let minY = this.app.renderer.width - this.app.stage.size;
 
             if (x <= minX) {
                 x = minX;
@@ -186,36 +230,27 @@ class Minimap extends utils.EventEmitter {
                 y = 0;
             }
 
-            let centerX = (-x + app.renderer.width / 2) / app.stage.size;
-            let centerY = (-y + app.renderer.height / 2) / app.stage.size;
+            let centerX = (-x + this.app.renderer.width / 2) / this.app.stage.size;
+            let centerY = (-y + this.app.renderer.height / 2) / this.app.stage.size;
 
             this.center.set(centerX, centerY);
         };
 
-        background.on('mousedown', e => {
+        this.app.stage.on('mousedown', e => {
             let { x: mouseX, y: mouseY } = e.data.global;
-            let { x, y } = componentLayer.position;
+            let { x, y } = this.componentLayer.position;
 
             componentPosition = { x, y };
             startMousePosition = { x: mouseX, y: mouseY };
         });
 
-        background.on('mousemove', e => {
+        this.app.stage.on('mousemove', e => {
             if (startMousePosition === null) return;
 
             move(e);
         });
 
-        background.on('mouseup', e => {
-            if (startMousePosition === null) return;
-
-            move(e);
-
-            componentPosition = null;
-            startMousePosition = null;
-        });
-
-        background.on('mouseupoutside', e => {
+        this.app.stage.on('mouseup', e => {
             if (startMousePosition === null) return;
 
             move(e);
@@ -224,19 +259,24 @@ class Minimap extends utils.EventEmitter {
             startMousePosition = null;
         });
 
-        this.center.on('change', () => {
-            this._invalidate();
+        this.app.stage.on('mouseupoutside', e => {
+            if (startMousePosition === null) return;
+
+            move(e);
+
+            componentPosition = null;
+            startMousePosition = null;
         });
     }
 
-    play() {
-        this.app.start();
+    _initializeTimer() {
+        this.app.ticker.add(delta => {
+            this._currentTime += 1000 * delta / 60 * this.speed;
+        });
     }
+    // endregion
 
-    pause() {
-        this.app.stop();
-    }
-
+    // region Properties
     get zoom() {
         return this._zoom;
     }
@@ -259,6 +299,32 @@ class Minimap extends utils.EventEmitter {
         this.app.stage.size = canvasSize * factor;
 
         this._invalidate();
+    }
+
+    get speed() {
+        return this._speed;
+    }
+
+    set speed(value) {
+        this._speed = value;
+    }
+
+    get currentTime() {
+        return this._currentTime;
+    }
+
+    set currentTime(value) {
+        this._currentTime = value;
+    }
+    // endregion
+
+    // region Methods
+    play() {
+        this.app.start();
+    }
+
+    pause() {
+        this.app.stop();
     }
 
     resize(canvasSize) {
@@ -286,22 +352,7 @@ class Minimap extends utils.EventEmitter {
 
         this.componentLayer.position.set(x, y);
     }
-
-    get speed() {
-        return this._speed;
-    }
-
-    set speed(value) {
-        this._speed = value;
-    }
-
-    get currentTime() {
-        return this._currentTime;
-    }
-
-    set currentTime(value) {
-        this._currentTime = value;
-    }
+    // endregion
 }
 
 export { Minimap };
