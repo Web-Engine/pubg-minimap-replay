@@ -1,4 +1,4 @@
-import { Application, Texture, Sprite, Point, utils, Container } from 'pixi.js';
+import { Application, Texture, Sprite, utils, Container } from 'pixi.js';
 import Player from './components/player';
 import WhiteCircle from './components/whiteCircle';
 import RedZone from './components/redZone';

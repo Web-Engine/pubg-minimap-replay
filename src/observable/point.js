@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 class ObservablePoint extends PIXI.utils.EventEmitter {
     constructor(x = 0, y = 0) {
