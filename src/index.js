@@ -269,7 +269,14 @@ class Minimap extends utils.EventEmitter {
 
     _initializeTimer() {
         this.app.ticker.add(delta => {
-            this.currentTime += 1000 * delta / 60 * this.speed;
+            let nextTime = this.currentTime + 1000 * delta / 60 * this.speed;
+
+            if (nextTime >= this.data.meta.duration) {
+                nextTime = this.data.meta.duration;
+                this.pause();
+            }
+
+            this.currentTime = nextTime;
         });
     }
     // endregion
