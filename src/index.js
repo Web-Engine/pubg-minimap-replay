@@ -48,10 +48,11 @@ class Minimap extends utils.EventEmitter {
 
         this._currentTime = 0;
         this._speed = 10;
+
+        this._size = this.options.size;
     }
 
     _initializePIXI() {
-        // Create pixi application
         let app = new Application({
             width: this.options.size,
             height: this.options.size,
@@ -109,7 +110,7 @@ class Minimap extends utils.EventEmitter {
             this.zoom = zoom;
         });
 
-        this.on('resized', () => {
+        this.on('size_change', () => {
             zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
         });
 
@@ -316,6 +317,28 @@ class Minimap extends utils.EventEmitter {
     set currentTime(value) {
         this._currentTime = value;
     }
+
+    get size() {
+        return this._size;
+    }
+
+    set size(value) {
+        this._size = value;
+
+        this.app.renderer.resize(value, value);
+
+        let factor = this._zoom;
+        let background = this.background;
+
+        background.width = value * factor;
+        background.height = value * factor;
+
+        this.app.stage.size = value * factor;
+
+        this._invalidate();
+
+        this.emit('size_change');
+    }
     // endregion
 
     // region Methods
@@ -325,22 +348,6 @@ class Minimap extends utils.EventEmitter {
 
     pause() {
         this.app.stop();
-    }
-
-    resize(canvasSize) {
-        this.app.renderer.resize(canvasSize, canvasSize);
-
-        let factor = this._zoom;
-        let background = this.background;
-
-        background.width = canvasSize * factor;
-        background.height = canvasSize * factor;
-
-        this.app.stage.size = canvasSize * factor;
-
-        this._invalidate();
-
-        this.emit('resized');
     }
 
     _invalidate() {
