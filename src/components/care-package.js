@@ -6,8 +6,8 @@ const FlyingTexture = Texture.from(Icon.CarePackage.Flying);
 const NormalTexture = Texture.from(Icon.CarePackage.Normal);
 
 class CarePackage extends Component {
-    constructor(data) {
-        super();
+    constructor(minimap, data) {
+        super(minimap);
 
         this._data = data;
 
@@ -26,9 +26,8 @@ class CarePackage extends Component {
     }
 
     seek(time) {
-        if (!this.root) return;
-
-        this.position.set(this._data.spawnLocation.x * this.root.size, this._data.spawnLocation.y * this.root.size);
+        let { x, y } = this.toScaledPoint(this._data.spawnLocation);
+        this.position.set(x, y);
 
         this.visible = this.spawnTime <= time;
         this._sprite.texture = this.landTime <= time ? NormalTexture : FlyingTexture;

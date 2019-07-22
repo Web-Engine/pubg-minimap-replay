@@ -3,8 +3,8 @@ import Component from './component';
 import { findCurrentState } from '../utils';
 
 class WhiteCircle extends Component {
-    constructor(data) {
-        super();
+    constructor(minimap, data) {
+        super(minimap);
 
         this._data = data;
         this._radius = 0;
@@ -23,6 +23,8 @@ class WhiteCircle extends Component {
     }
 
     set radius(value) {
+        if (this._radius === value) return;
+
         this._radius = value;
 
         this._circle.clear();
@@ -32,13 +34,16 @@ class WhiteCircle extends Component {
     }
 
     seek(time) {
-        if (!this.root) return;
-
         let { before } = findCurrentState(this._data, time);
         if (!before) return;
 
-        this.position.set(before.location.x * this.root.size, before.location.y * this.root.size);
-        this.radius = before.radius * this.root.size;
+        let { location, radius } = before;
+
+        let { x, y } = this.toScaledPoint(location);
+        let scaledRadius = this.toScaledValue(radius);
+
+        this.position.set(x, y);
+        this.radius = scaledRadius;
     }
 }
 

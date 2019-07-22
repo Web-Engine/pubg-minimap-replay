@@ -1,34 +1,21 @@
 import { Container } from 'pixi.js';
 
 class Component extends Container {
-    constructor() {
+    constructor(minimap) {
         super();
 
-        this.root = null;
+        this.minimap = minimap;
+    }
 
-        let onRootChange = () => {
-            let root = this.parent;
+    toScaledValue(value) {
+        return value * this.minimap.size * this.minimap.zoom;
+    }
 
-            while (root.parent) {
-                root = root.parent;
-            }
-
-            if (this.root) {
-                this.root.off('added', onRootChange);
-            }
-
-            root.on('added', onRootChange);
-
-            this.root = root;
+    toScaledPoint(point) {
+        return {
+            x: this.toScaledValue(point.x),
+            y: this.toScaledValue(point.y),
         };
-
-        this.on('added', onRootChange);
-
-        this.on('removed', () => {
-            this.root.off('added', onRootChange);
-
-            this.root = null;
-        });
     }
 }
 

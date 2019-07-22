@@ -1,10 +1,10 @@
 import { Text, Graphics } from 'pixi.js';
-import { findCurrentState } from '../utils';
+import { calcPointRatio, findCurrentState } from '../utils';
 import Component from './component';
 
 class Player extends Component {
-    constructor(data) {
-        super();
+    constructor(minimap, data) {
+        super(minimap);
 
         this.data = data;
         this.name = data.name;
@@ -32,8 +32,6 @@ class Player extends Component {
     }
 
     seek(time) {
-        if (!this.root) return;
-
         {
             let { before, after, ratio } = findCurrentState(this.locations, time);
 
@@ -44,15 +42,16 @@ class Player extends Component {
             }
 
             if (!after) {
-                this.x = before.location.x * this.root.size;
-                this.y = before.location.y * this.root.size;
+                let { x, y } = this.toScaledPoint(before.location);
+                this.position.set(x, y);
+
                 return;
             }
 
-            let x = before.location.x * ratio + after.location.x * (1 - ratio);
-            let y = before.location.y * ratio + after.location.y * (1 - ratio);
+            let location = calcPointRatio(before.location, after.location, ratio);
+            let { x, y } = this.toScaledPoint(location);
 
-            this.position.set(x * this.root.size, y * this.root.size);
+            this.position.set(x, y);
         }
 
         {

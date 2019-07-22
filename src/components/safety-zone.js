@@ -1,10 +1,10 @@
 import { Graphics } from 'pixi.js';
 import Component from './component';
-import { findCurrentState } from '../utils';
+import { calcValueRatio, calcPointRatio, findCurrentState } from '../utils';
 
 class SafetyZone extends Component {
-    constructor(data) {
-        super();
+    constructor(minimap, data) {
+        super(minimap);
 
         this._data = data;
         this._radius = 0;
@@ -23,6 +23,8 @@ class SafetyZone extends Component {
     }
 
     set radius(value) {
+        if (this._radius === value) return;
+
         this._radius = value;
 
         this._circle.clear();
@@ -32,23 +34,25 @@ class SafetyZone extends Component {
     }
 
     seek(time) {
-        if (!this.root) return;
-
         let { before, after, ratio } = findCurrentState(this._data, time);
         if (!before) return;
 
         if (!after) {
-            this.position.set(before.location.x * this.root.size, before.location.y * this.root.size);
-            this.radius = before.radius * this.root.size;
+            let { x, y } = this.toScaledPoint(before.location);
+            this.position.set(x, y);
+
+            this.radius = this.toScaledValue(before.radius);
             return;
         }
 
-        let x = before.location.x * ratio + after.location.x * (1 - ratio);
-        let y = before.location.y * ratio + after.location.y * (1 - ratio);
-        let radius = before.radius * ratio + after.radius * (1 - ratio);
+        let point = calcPointRatio(before.location, after.location, ratio);
+        let { x, y } = this.toScaledPoint(point);
 
-        this.position.set(x * this.root.size, y * this.root.size);
-        this.radius = radius * this.root.size;
+        let radius = calcValueRatio(before.radius, after.radius, ratio);
+        let scaledRadius = this.toScaledValue(radius);
+
+        this.position.set(x, y);
+        this.radius = scaledRadius;
     }
 }
 

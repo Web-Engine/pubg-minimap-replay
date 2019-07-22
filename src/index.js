@@ -53,15 +53,13 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializePIXI() {
-        let app = new Application({
-            width: this.options.size,
-            height: this.options.size,
+        this.app = new Application({
+            width: this.size,
+            height: this.size,
             antialias: true,
         });
 
-        this.app = app;
-
-        app.stage.size = this.options.size;
+        this.app.stage.size = this.size;
     }
 
     _initializeUI() {
@@ -140,9 +138,9 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeCircles() {
-        let whiteCircle = new WhiteCircle(this.data.whiteCircle);
-        let redZone = new RedZone(this.data.redZone);
-        let safetyZone = new SafetyZone(this.data.safetyZone);
+        let whiteCircle = new WhiteCircle(this, this.data.whiteCircle);
+        let redZone = new RedZone(this, this.data.redZone);
+        let safetyZone = new SafetyZone(this, this.data.safetyZone);
 
         this.componentLayer.addChild(whiteCircle);
         this.componentLayer.addChild(safetyZone);
@@ -162,7 +160,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer.addChild(playersContainer);
 
         for (let playerData of Object.values(this.data.players)) {
-            let player = new Player(playerData);
+            let player = new Player(this, playerData);
             players.push(player);
 
             playersContainer.addChild(player);
@@ -182,7 +180,7 @@ class Minimap extends utils.EventEmitter {
 
         let carePackages = [];
         for (let carePackageData of this.data.carePackages) {
-            let carePackage = new CarePackage(carePackageData);
+            let carePackage = new CarePackage(this, carePackageData);
             carePackages.push(carePackage);
 
             carePackagesContainer.addChild(carePackage);
@@ -290,14 +288,12 @@ class Minimap extends utils.EventEmitter {
         this._center.set(value.x, value.y);
     }
 
-    set zoom(factor) {
-        this._zoom = factor;
+    set zoom(value) {
+        this._zoom = value;
 
         let background = this.background;
-        background.width = canvasSize * factor;
-        background.height = canvasSize * factor;
-
-        this.app.stage.size = canvasSize * factor;
+        background.width = this.size * value;
+        background.height = this.size * value;
 
         this._invalidate();
     }

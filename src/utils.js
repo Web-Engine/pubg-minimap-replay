@@ -1,3 +1,14 @@
+function calcValueRatio(a, b, ratio) {
+    return a * ratio + b * (1 - ratio);
+}
+
+function calcPointRatio(a, b, ratio) {
+    return {
+        x: calcValueRatio(a.x, b.x, ratio),
+        y: calcValueRatio(a.y, b.y, ratio),
+    };
+}
+
 function findCurrentState(array, time) {
     let left = 0;
     let right = array.length - 1;
@@ -589,4 +600,4 @@ function getTime(str) {
     return new Date(str).getTime();
 }
 
-export { findCurrentState, normalizeData };
+export { calcValueRatio, calcPointRatio, findCurrentState, normalizeData };
