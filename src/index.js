@@ -201,7 +201,7 @@ class Minimap extends utils.EventEmitter {
         let componentPosition = null;
         let startMousePosition = null;
 
-        this.app.stage.interactive = true;
+        this.background.interactive = true;
 
         let move = e => {
             let { x: mouseX, y: mouseY } = e.data.global;
@@ -212,30 +212,29 @@ class Minimap extends utils.EventEmitter {
             let x = componentPosition.x + diffX;
             let y = componentPosition.y + diffY;
 
-            let minX = this.app.renderer.width - this.app.stage.size;
-            let minY = this.app.renderer.width - this.app.stage.size;
+            let min = (1 - this.zoom) * this.size;
 
-            if (x <= minX) {
-                x = minX;
+            if (x <= min) {
+                x = min;
             }
             else if (x >= 0) {
                 x = 0;
             }
 
-            if (y <= minY) {
-                y = minY;
+            if (y <= min) {
+                y = min;
             }
             else if (y >= 0) {
                 y = 0;
             }
 
-            let centerX = (-x + this.app.renderer.width / 2) / this.app.stage.size;
-            let centerY = (-y + this.app.renderer.height / 2) / this.app.stage.size;
+            let centerX = (-x + this.size / 2) / (this.size * this.zoom);
+            let centerY = (-y + this.size / 2) / (this.size * this.zoom);
 
             this.center.set(centerX, centerY);
         };
 
-        this.app.stage.on('mousedown', e => {
+        this.background.on('mousedown', e => {
             let { x: mouseX, y: mouseY } = e.data.global;
             let { x, y } = this.componentLayer.position;
 
@@ -243,13 +242,13 @@ class Minimap extends utils.EventEmitter {
             startMousePosition = { x: mouseX, y: mouseY };
         });
 
-        this.app.stage.on('mousemove', e => {
+        this.background.on('mousemove', e => {
             if (startMousePosition === null) return;
 
             move(e);
         });
 
-        this.app.stage.on('mouseup', e => {
+        this.background.on('mouseup', e => {
             if (startMousePosition === null) return;
 
             move(e);
@@ -258,7 +257,7 @@ class Minimap extends utils.EventEmitter {
             startMousePosition = null;
         });
 
-        this.app.stage.on('mouseupoutside', e => {
+        this.background.on('mouseupoutside', e => {
             if (startMousePosition === null) return;
 
             move(e);
@@ -291,9 +290,8 @@ class Minimap extends utils.EventEmitter {
     set zoom(value) {
         this._zoom = value;
 
-        let background = this.background;
-        background.width = this.size * value;
-        background.height = this.size * value;
+        this.background.width = this.size * value;
+        this.background.height = this.size * value;
 
         this._invalidate();
     }
@@ -329,8 +327,6 @@ class Minimap extends utils.EventEmitter {
         background.width = value * factor;
         background.height = value * factor;
 
-        this.app.stage.size = value * factor;
-
         this._invalidate();
 
         this.emit('size_change');
@@ -347,11 +343,8 @@ class Minimap extends utils.EventEmitter {
     }
 
     _invalidate() {
-        let canvasSize = this.app.renderer.width;
-        let background = this.background;
-
-        let x = -background.width * this.center.x + canvasSize / 2;
-        let y = -background.height * this.center.y + canvasSize / 2;
+        let x = -(this.size * this.zoom) * this.center.x + this.size / 2;
+        let y = -(this.size * this.zoom) * this.center.y + this.size / 2;
 
         this.componentLayer.position.set(x, y);
     }
