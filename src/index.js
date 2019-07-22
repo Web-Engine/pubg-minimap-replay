@@ -1,9 +1,9 @@
 import { Application, Texture, Sprite, utils, Container } from 'pixi.js';
 import Player from './components/player';
-import WhiteCircle from './components/whiteCircle';
-import RedZone from './components/redZone';
-import SafetyZone from './components/safetyZone';
-import CarePackage from './components/carePackage';
+import WhiteCircle from './components/white-circle';
+import RedZone from './components/red-zone';
+import SafetyZone from './components/safety-zone';
+import CarePackage from './components/care-package';
 import { normalizeData } from './utils';
 import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
