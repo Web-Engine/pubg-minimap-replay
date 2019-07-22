@@ -10,7 +10,6 @@ import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
 import ObservablePoint from './observable/point';
 
-const canvasSize = 819;
 const mapSize = 400000;
 
 class Minimap extends utils.EventEmitter {
