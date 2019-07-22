@@ -1,7 +1,7 @@
 import { Container, Text, Graphics } from 'pixi.js';
 import { findCurrentState } from '../utils';
 
-class AlivePlayerUI extends Container {
+class AlivePlayersUI extends Container {
     constructor(data) {
         super();
 
@@ -49,4 +49,4 @@ class AlivePlayerUI extends Container {
     }
 }
 
-export default AlivePlayerUI;
+export default AlivePlayersUI;

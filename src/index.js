@@ -5,7 +5,7 @@ import RedZone from './components/redZone';
 import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
 import { normalizeData } from './utils';
-import AlivePlayerUI from './components/alivePlayers';
+import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
 import ObservablePoint from './observable/point';
@@ -119,13 +119,13 @@ class Minimap extends utils.EventEmitter {
             }
         });
 
-        let alivePlayerUI = new AlivePlayerUI(data.alivePlayers);
-        alivePlayerUI.position.set(20, 20);
+        let alivePlayers = new AlivePlayersUI(data.alivePlayers);
+        alivePlayers.position.set(20, 20);
 
-        uiLayer.addChild(alivePlayerUI);
+        uiLayer.addChild(alivePlayers);
 
         app.ticker.add(() => {
-            alivePlayerUI.seek(this.currentTime);
+            alivePlayers.seek(this.currentTime);
         });
 
         let zoomController = new ZoomControllerUI();
