@@ -129,7 +129,7 @@ class Minimap extends utils.EventEmitter {
         });
 
         let zoomController = new ZoomControllerUI();
-        zoomController.position.set(720, 760);
+        zoomController.position.set(app.renderer.width - zoomController.width - 20, app.renderer.height - zoomController.height - 20);
 
         zoomController.on('expand', () => {
             let zoom = this.zoom + 1;
@@ -147,6 +147,10 @@ class Minimap extends utils.EventEmitter {
             }
 
             this.zoom = zoom;
+        });
+
+        this.on('resized', () => {
+            zoomController.position.set(app.renderer.width - zoomController.width - 20, app.renderer.height - zoomController.height - 20);
         });
 
         uiLayer.addChild(zoomController);
@@ -269,6 +273,8 @@ class Minimap extends utils.EventEmitter {
         this.app.stage.size = canvasSize * factor;
 
         this.invalidate();
+
+        this.emit('resized');
     }
 
     invalidate() {
