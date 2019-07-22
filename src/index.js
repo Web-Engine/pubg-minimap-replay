@@ -35,14 +35,20 @@ class Minimap extends utils.EventEmitter {
         app.stage.height = canvasSize;
         app.stage.size = canvasSize;
 
+        // Add component layer
+        let componentLayer = new Container();
+        componentLayer.width = app.view.width;
+        componentLayer.height = app.view.height;
+        app.stage.addChild(componentLayer);
+        this.componentLayer = componentLayer;
+
         // Load background sprite
         const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
         const background = new Sprite(backgroundTexture);
         background.width = canvasSize;
         background.height = canvasSize;
-        app.stage.addChild(background);
-
         this.background = background;
+        componentLayer.addChild(background);
 
         // Add ui layer
         let uiLayer = new Container();
@@ -51,13 +57,6 @@ class Minimap extends utils.EventEmitter {
         app.stage.addChild(uiLayer);
 
         this.uiLayer = uiLayer;
-
-        // Add component layer
-        let componentLayer = new Container();
-        componentLayer.width = app.view.width;
-        componentLayer.height = app.view.height;
-        app.stage.addChild(componentLayer);
-        this.componentLayer = componentLayer;
 
         this._currentTime = 0;
         this._speed = 10;
@@ -79,7 +78,7 @@ class Minimap extends utils.EventEmitter {
             playerContainer.addChild(playerComponent);
         }
 
-        this.app.ticker.add(() => {
+        app.ticker.add(() => {
             for (let player of players) {
                 player.seek(this.currentTime);
             }
@@ -94,7 +93,7 @@ class Minimap extends utils.EventEmitter {
         componentLayer.addChild(safetyZone);
         componentLayer.addChild(redZone);
 
-        this.app.ticker.add(() => {
+        app.ticker.add(() => {
             whiteCircle.seek(this.currentTime);
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
@@ -112,7 +111,7 @@ class Minimap extends utils.EventEmitter {
             carePackageContainer.addChild(carePackageSprite);
         }
 
-        this.app.ticker.add(() => {
+        app.ticker.add(() => {
             for (let carePackage of carePackageSprites) {
                 carePackage.seek(this.currentTime);
             }
@@ -123,8 +122,74 @@ class Minimap extends utils.EventEmitter {
 
         uiLayer.addChild(alivePlayerUI);
 
-        this.app.ticker.add(() => {
+        app.ticker.add(() => {
             alivePlayerUI.seek(this.currentTime);
+        });
+
+        function move(e) {
+            let { x: mouseX, y: mouseY } = e.data.global;
+
+            let diffX = mouseX - startMousePosition.x;
+            let diffY = mouseY - startMousePosition.y;
+
+            let x = componentPosition.x + diffX;
+            let y = componentPosition.y + diffY;
+
+            let minX = app.renderer.width - app.stage.size;
+            let minY = app.renderer.width - app.stage.size;
+
+            if (x <= minX) {
+                x = minX;
+            }
+            else if (x >= 0) {
+                x = 0;
+            }
+
+            if (y <= minY) {
+                y = minY;
+            }
+            else if (y >= 0) {
+                y = 0;
+            }
+
+            componentLayer.position.set(x, y);
+        }
+
+        let componentPosition = null;
+        let startMousePosition = null;
+
+        background.interactive = true;
+
+        background.on('mousedown', e => {
+            let { x: mouseX, y: mouseY } = e.data.global;
+            let { x, y } = componentLayer.position;
+
+            componentPosition = { x, y };
+            startMousePosition = { x: mouseX, y: mouseY };
+        });
+
+        background.on('mousemove', e => {
+            if (startMousePosition === null) return;
+
+            move(e);
+        });
+
+        background.on('mouseup', e => {
+            if (startMousePosition === null) return;
+
+            move(e);
+
+            componentPosition = null;
+            startMousePosition = null;
+        });
+
+        background.on('mouseupoutside', e => {
+            if (startMousePosition === null) return;
+
+            move(e);
+
+            componentPosition = null;
+            startMousePosition = null;
         });
     }
 
@@ -163,7 +228,6 @@ class Minimap extends utils.EventEmitter {
         let y = -background.height * this.center.y + canvasSize / 2;
 
         this.componentLayer.position.set(x, y);
-        this.background.position.set(x, y);
 
         this.app.stage.size = canvasSize * factor;
     }
