@@ -1,15 +1,15 @@
-import { Container, Graphics, Text } from 'pixi.js'
+import { Container, Graphics, Text } from 'pixi.js';
 
 class Button extends Container {
     constructor({
-                    text = null,
-                    width = 30,
-                    height = 30,
-                    textSize = 16,
-                    textColor = 0xFFFFFF,
-                    backgroundColor = 0x565656,
-                    backgroundAlpha = 0.8
-                } = {}) {
+        text = null,
+        width = 30,
+        height = 30,
+        textSize = 16,
+        textColor = 0xFFFFFF,
+        backgroundColor = 0x565656,
+        backgroundAlpha = 0.8,
+    } = {}) {
         super();
 
         this.interactive = true;
