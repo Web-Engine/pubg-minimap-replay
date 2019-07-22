@@ -10,7 +10,7 @@ class WhiteCircle extends Component {
         this._radius = 0;
 
         let circle = new Graphics();
-        circle.lineStyle(15, 0xFFFFFF, 1);
+        circle.lineStyle(2, 0xFFFFFF, 1);
         circle.drawCircle(0, 0, 0);
 
         this._circle = circle;
@@ -28,14 +28,17 @@ class WhiteCircle extends Component {
         this._radius = value;
 
         this._circle.clear();
-
-        this._circle.lineStyle(2, 0xFFFFFF, 1);
         this._circle.drawCircle(0, 0, value);
     }
 
     seek(time) {
         let { before } = findCurrentState(this._data, time);
-        if (!before) return;
+
+        if (!before) {
+            this.position.set(-1000, -1000);
+            this.radius = 0;
+            return;
+        }
 
         let { location, radius } = before;
 

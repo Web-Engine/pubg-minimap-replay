@@ -37,7 +37,12 @@ class RedZone extends Component {
 
     seek(time) {
         let { before } = findCurrentState(this._data, time);
-        if (!before) return;
+
+        if (!before) {
+            this.position.set(-1000, -1000);
+            this.radius = 0;
+            return;
+        }
 
         let { location, radius } = before;
 
