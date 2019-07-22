@@ -7,6 +7,7 @@ import CarePackage from './components/carePackage';
 import { normalizeData } from './utils';
 import AlivePlayerUI from './components/alivePlayers';
 import { Background } from './assets';
+import ObservablePoint from './observable/point';
 
 const canvasSize = 819;
 const mapSize = 400000;
@@ -18,7 +19,7 @@ class Minimap extends utils.EventEmitter {
         data = normalizeData(data, 1 / mapSize);
 
         this._zoom = 1;
-        this._center = new Point(.5, .5);
+        this._center = new ObservablePoint(.5, .5);
 
         this._data = data;
 
@@ -157,12 +158,10 @@ class Minimap extends utils.EventEmitter {
                 y = 0;
             }
 
-            let centerX = (-componentLayer.position.x + app.renderer.width / 2) / app.stage.size;
-            let centerY = (-componentLayer.position.y + app.renderer.height / 2) / app.stage.size;
+            let centerX = (-x + app.renderer.width / 2) / app.stage.size;
+            let centerY = (-y + app.renderer.height / 2) / app.stage.size;
 
             this.center.set(centerX, centerY);
-
-            componentLayer.position.set(x, y);
         };
 
         background.on('mousedown', e => {
@@ -196,6 +195,10 @@ class Minimap extends utils.EventEmitter {
             componentPosition = null;
             startMousePosition = null;
         });
+
+        this.center.on('change', () => {
+            this.invalidate();
+        });
     }
 
     play() {
@@ -214,27 +217,44 @@ class Minimap extends utils.EventEmitter {
         return this._center;
     }
 
+    set center(value) {
+        this._center.set(value.x, value.y);
+    }
+
     set zoom(factor) {
         this._zoom = factor;
 
-        this.resize(this.app.renderer.width);
+        let background = this.background;
+        background.width = canvasSize * factor;
+        background.height = canvasSize * factor;
+
+        this.app.stage.size = canvasSize * factor;
+
+        this.invalidate();
     }
 
     resize(canvasSize) {
         this.app.renderer.resize(canvasSize, canvasSize);
 
         let factor = this._zoom;
-
         let background = this.background;
+
         background.width = canvasSize * factor;
         background.height = canvasSize * factor;
+
+        this.app.stage.size = canvasSize * factor;
+
+        this.invalidate();
+    }
+
+    invalidate() {
+        let canvasSize = this.app.renderer.width;
+        let background = this.background;
 
         let x = -background.width * this.center.x + canvasSize / 2;
         let y = -background.height * this.center.y + canvasSize / 2;
 
         this.componentLayer.position.set(x, y);
-
-        this.app.stage.size = canvasSize * factor;
     }
 
     get speed() {
