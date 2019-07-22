@@ -315,6 +315,7 @@ function normalizeData(logs, ratio) {
         meta: {
             mapName: mapNames[matchStart.mapName],
             terrain: matchStart.mapName,
+            duration: 0,
         },
         players: {},
         redZone: [],
@@ -454,6 +455,7 @@ function normalizeData(logs, ratio) {
                 player.ranking = character.ranking;
             }
 
+            data.meta.duration = elapsedTime;
             break;
         }
 
