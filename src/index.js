@@ -43,7 +43,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer = componentLayer;
 
         // Load background sprite
-        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
+        const backgroundTexture = Texture.from(Background[data.meta.mapName].high);
         const background = new Sprite(backgroundTexture);
         background.width = canvasSize;
         background.height = canvasSize;
