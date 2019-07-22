@@ -126,7 +126,12 @@ class Minimap extends utils.EventEmitter {
             alivePlayerUI.seek(this.currentTime);
         });
 
-        function move(e) {
+        let componentPosition = null;
+        let startMousePosition = null;
+
+        background.interactive = true;
+
+        let move = e => {
             let { x: mouseX, y: mouseY } = e.data.global;
 
             let diffX = mouseX - startMousePosition.x;
@@ -152,13 +157,13 @@ class Minimap extends utils.EventEmitter {
                 y = 0;
             }
 
+            let centerX = (-componentLayer.position.x + app.renderer.width / 2) / app.stage.size;
+            let centerY = (-componentLayer.position.y + app.renderer.height / 2) / app.stage.size;
+
+            this.center.set(centerX, centerY);
+
             componentLayer.position.set(x, y);
-        }
-
-        let componentPosition = null;
-        let startMousePosition = null;
-
-        background.interactive = true;
+        };
 
         background.on('mousedown', e => {
             let { x: mouseX, y: mouseY } = e.data.global;
