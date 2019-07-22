@@ -13,15 +13,8 @@ class Player extends Component {
         this.locations = data.locations;
         this.healths = data.healths;
 
-        this.health = 100;
-
         let circle = new Graphics();
         this.addChild(circle);
-
-        circle.lineStyle(1);
-        circle.beginFill(0xFFFFFF);
-        circle.drawCircle(0, 0, 10);
-        circle.endFill();
 
         this.circle = circle;
 
@@ -29,6 +22,43 @@ class Player extends Component {
         text.anchor.set(0.5, 0.5);
 
         this.addChild(text);
+
+        this.health = 100;
+    }
+
+    get health() {
+        return this._health;
+    }
+
+    set health(value) {
+        if (this._health === value) return;
+
+        this._health = value;
+
+        this.circle.clear();
+
+        if (value === 0) {
+            this.circle.lineStyle(1);
+            this.circle.beginFill(0xFF0000);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.endFill();
+            this.circle.lineStyle(0);
+        }
+        else {
+            this.circle.beginFill(0xFF0000);
+            this.circle.moveTo(0, 0);
+            this.circle.arc(0, 0, 10, Math.PI * value / 50, Math.PI * 2);
+            this.circle.endFill();
+
+            this.circle.beginFill(0xFFFFFF);
+            this.circle.moveTo(0, 0);
+            this.circle.arc(0, 0, 10, 0, Math.PI * value / 50);
+            this.circle.endFill();
+
+            this.circle.lineStyle(1);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.lineStyle(0);
+        }
     }
 
     seek(time) {
@@ -65,22 +95,6 @@ class Player extends Component {
             if (this.health === health) return;
 
             this.health = health;
-
-            this.circle.clear();
-
-            this.circle.beginFill(0xFF0000);
-            this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, Math.PI * health / 50, Math.PI * 2);
-            this.circle.endFill();
-
-            this.circle.beginFill(0xFFFFFF);
-            this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, 0, Math.PI * health / 50);
-            this.circle.endFill();
-
-            this.circle.lineStyle(1);
-            this.circle.drawCircle(0, 0, 10);
-            this.circle.lineStyle(0);
         }
     }
 }
