@@ -67,16 +67,20 @@ class Player extends Component {
             this.health = health;
 
             this.circle.clear();
-            this.circle.lineStyle(1);
 
             this.circle.beginFill(0xFF0000);
-            this.circle.drawCircle(0, 0, 10);
+            this.circle.moveTo(0, 0);
+            this.circle.arc(0, 0, 10, Math.PI * health / 50, Math.PI * 2);
             this.circle.endFill();
 
             this.circle.beginFill(0xFFFFFF);
             this.circle.moveTo(0, 0);
             this.circle.arc(0, 0, 10, 0, Math.PI * health / 50);
             this.circle.endFill();
+
+            this.circle.lineStyle(1);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.lineStyle(0);
         }
     }
 }
