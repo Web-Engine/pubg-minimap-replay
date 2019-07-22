@@ -108,7 +108,7 @@ class Minimap extends utils.EventEmitter {
             this.zoom = zoom;
         });
 
-        this.on('size_change', () => {
+        this.on('sizeChange', () => {
             zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
         });
 
@@ -335,7 +335,7 @@ class Minimap extends utils.EventEmitter {
 
         this._invalidate();
 
-        this.emit('size_change');
+        this.emit('sizeChange');
     }
 
     get isPlaying() {
@@ -357,6 +357,7 @@ class Minimap extends utils.EventEmitter {
         this._isPlaying = true;
         this.app.start();
     }
+
 
     pause() {
         this._isPlaying = false;
