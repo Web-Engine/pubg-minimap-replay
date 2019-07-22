@@ -225,7 +225,7 @@ class Minimap extends utils.EventEmitter {
         });
 
         this.center.on('change', () => {
-            this.invalidate();
+            this._invalidate();
         });
     }
 
@@ -258,7 +258,7 @@ class Minimap extends utils.EventEmitter {
 
         this.app.stage.size = canvasSize * factor;
 
-        this.invalidate();
+        this._invalidate();
     }
 
     resize(canvasSize) {
@@ -272,12 +272,12 @@ class Minimap extends utils.EventEmitter {
 
         this.app.stage.size = canvasSize * factor;
 
-        this.invalidate();
+        this._invalidate();
 
         this.emit('resized');
     }
 
-    invalidate() {
+    _invalidate() {
         let canvasSize = this.app.renderer.width;
         let background = this.background;
 
