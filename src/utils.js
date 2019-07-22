@@ -446,7 +446,6 @@ function normalizeData(logs, ratio) {
         }
 
         case 'LogMatchEnd': {
-            // TODO: update rank
             for (let character of log.characters) {
                 let player = getPlayer(character.accountId);
 
