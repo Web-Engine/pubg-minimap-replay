@@ -49,6 +49,7 @@ class Minimap extends utils.EventEmitter {
         this._speed = 10;
 
         this._size = this.options.size;
+        this._isPlaying = true;
     }
 
     _initializePIXI() {
@@ -78,7 +79,7 @@ class Minimap extends utils.EventEmitter {
 
         this.uiLayer.addChild(alivePlayers);
 
-        this.app.ticker.add(() => {
+        this.on('currentTimeChange', () => {
             alivePlayers.seek(this.currentTime);
         });
     }
@@ -145,7 +146,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer.addChild(safetyZone);
         this.componentLayer.addChild(redZone);
 
-        this.app.ticker.add(() => {
+        this.on('currentTimeChange', () => {
             whiteCircle.seek(this.currentTime);
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
@@ -165,7 +166,7 @@ class Minimap extends utils.EventEmitter {
             playersContainer.addChild(player);
         }
 
-        this.app.ticker.add(() => {
+        this.on('currentTimeChange', () => {
             for (let player of players) {
                 player.seek(this.currentTime);
             }
@@ -185,7 +186,7 @@ class Minimap extends utils.EventEmitter {
             carePackagesContainer.addChild(carePackage);
         }
 
-        this.app.ticker.add(() => {
+        this.on('currentTimeChange', () => {
             for (let carePackage of carePackages) {
                 carePackage.seek(this.currentTime);
             }
@@ -268,7 +269,7 @@ class Minimap extends utils.EventEmitter {
 
     _initializeTimer() {
         this.app.ticker.add(delta => {
-            this._currentTime += 1000 * delta / 60 * this.speed;
+            this.currentTime += 1000 * delta / 60 * this.speed;
         });
     }
     // endregion
@@ -309,6 +310,12 @@ class Minimap extends utils.EventEmitter {
 
     set currentTime(value) {
         this._currentTime = value;
+
+        this.emit('currentTimeChange');
+
+        if (!this.isPlaying) {
+            this.app.render();
+        }
     }
 
     get size() {
@@ -330,14 +337,29 @@ class Minimap extends utils.EventEmitter {
 
         this.emit('size_change');
     }
+
+    get isPlaying() {
+        return this._isPlaying;
+    }
+
+    set isPlaying(value) {
+        if (value) {
+            this.play();
+        }
+        else {
+            this.pause();
+        }
+    }
     // endregion
 
     // region Methods
     play() {
+        this._isPlaying = true;
         this.app.start();
     }
 
     pause() {
+        this._isPlaying = false;
         this.app.stop();
     }
 
@@ -346,6 +368,9 @@ class Minimap extends utils.EventEmitter {
         let y = -(this.size * this.zoom) * this.center.y + this.size / 2;
 
         this.componentLayer.position.set(x, y);
+        this.emit('invalidate');
+
+        this.app.render();
     }
     // endregion
 }
