@@ -6,6 +6,7 @@ import SafetyZone from './components/safetyZone';
 import CarePackage from './components/carePackage';
 import { normalizeData } from './utils';
 import AlivePlayerUI from './components/alivePlayers';
+import ZoomButtonUI from './components/zoomButton';
 import { Background } from './assets';
 import ObservablePoint from './observable/point';
 
@@ -44,7 +45,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer = componentLayer;
 
         // Load background sprite
-        const backgroundTexture = Texture.from(Background[data.meta.mapName].high);
+        const backgroundTexture = Texture.from(Background[data.meta.mapName].low);
         const background = new Sprite(backgroundTexture);
         background.width = canvasSize;
         background.height = canvasSize;
@@ -126,6 +127,29 @@ class Minimap extends utils.EventEmitter {
         app.ticker.add(() => {
             alivePlayerUI.seek(this.currentTime);
         });
+
+        let zoomButtonUI = new ZoomButtonUI();
+        zoomButtonUI.position.set(720, 760);
+
+        zoomButtonUI.on('expand', () => {
+            let zoom = this.zoom + 1;
+            if (zoom > 10) {
+                zoom = 10;
+            }
+
+            this.zoom = zoom;
+        });
+
+        zoomButtonUI.on('contract', () => {
+            let zoom = this.zoom - 1;
+            if (zoom < 1) {
+                zoom = 1;
+            }
+
+            this.zoom = zoom;
+        });
+
+        uiLayer.addChild(zoomButtonUI);
 
         let componentPosition = null;
         let startMousePosition = null;
