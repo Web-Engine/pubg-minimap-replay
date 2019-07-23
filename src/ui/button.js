@@ -8,7 +8,7 @@ class Button extends Container {
         textSize = 16,
         textColor = 0xFFFFFF,
         backgroundColor = 0x565656,
-        backgroundAlpha = 0.8,
+        backgroundAlpha = 0.9,
     } = {}) {
         super();
 
