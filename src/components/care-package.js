@@ -11,15 +11,15 @@ class CarePackage extends Component {
 
         this._data = data;
 
-        let sprite = new Sprite(FlyingTexture);
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
-        this._sprite = sprite;
+        let carePackage = new Sprite(FlyingTexture);
+        carePackage.anchor.x = 0.5;
+        carePackage.anchor.y = 0.5;
+        this._carePackage = carePackage;
 
-        this.addChild(sprite);
+        this.addChild(carePackage);
 
-        sprite.scale.x = .2;
-        sprite.scale.y = .2;
+        carePackage.scale.x = .2;
+        carePackage.scale.y = .2;
 
         this.spawnTime = data.spawnTime;
         this.landTime = data.landTime;
@@ -70,7 +70,7 @@ class CarePackage extends Component {
         this.position.set(x, y);
 
         this.visible = this.spawnTime <= time;
-        this._sprite.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
+        this._carePackage.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
     }
 }
 
