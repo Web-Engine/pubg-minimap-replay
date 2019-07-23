@@ -43,17 +43,16 @@ class Player extends Component {
         nameBox.endFill();
         nameBox.zIndex = 1;
 
+        nameText.visible = false;
+        nameBox.visible = false;
+
+        this.addChild(nameBox);
+        this.addChild(nameText);
+
         this.on('click', () => {
-            if (showName === false) {
-                this.addChild(nameBox);
-                this.addChild(nameText);
-                showName = true;
-            }
-            else {
-                this.removeChild(nameBox);
-                this.removeChild(nameText);
-                showName = false;
-            }
+            showName = !showName;
+            nameText.visible = showName;
+            nameBox.visible = showName;
         });
 
         this._state = enums.PlayerState.ALIVE;
