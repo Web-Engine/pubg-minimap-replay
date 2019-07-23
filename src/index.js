@@ -4,7 +4,7 @@ import WhiteCircle from './components/white-circle';
 import RedZone from './components/red-zone';
 import SafetyZone from './components/safety-zone';
 import CarePackage from './components/care-package';
-import { normalizeData } from './utils';
+import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
