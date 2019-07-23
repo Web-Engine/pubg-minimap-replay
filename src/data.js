@@ -139,8 +139,6 @@ const enums = {
 };
 
 function normalizeData(logs, ratio) {
-    window.logs = logs;
-
     function normalizeNumber(number) {
         return number * ratio;
     }
