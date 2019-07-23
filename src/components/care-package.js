@@ -58,11 +58,6 @@ class CarePackage extends Component {
             itemNameText.visible = showName;
             itemNameBox.visible = showName;
         });
-
-
-        this.on('click', () => {
-
-        });
     }
 
     seek(time) {
