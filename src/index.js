@@ -365,7 +365,6 @@ class Minimap extends utils.EventEmitter {
         this.app.start();
     }
 
-
     pause() {
         this._isPlaying = false;
         this.app.stop();

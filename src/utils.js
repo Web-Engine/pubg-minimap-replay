@@ -376,6 +376,8 @@ function normalizeData(logs, ratio) {
 
                 landTime: null,
                 landLocation: null,
+
+                items: itemPackage.items,
             });
 
             break;
