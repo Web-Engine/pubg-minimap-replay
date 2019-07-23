@@ -30,6 +30,9 @@ class CarePackage extends Component {
         let items = '';
         for (let numItem = 0; numItem < data.items.length; numItem++) {
             items += data.items[numItem].itemId;
+            if (data.items[numItem].stackCount !== 1) {
+                items += ' ( ' + data.items[numItem].stackCount + ' )';
+            }
             if (numItem !== data.items.length - 1) {
                 items += '\n';
             }
