@@ -87,7 +87,7 @@ class Minimap extends utils.EventEmitter {
     _initializeZoomControllerUI() {
         let renderer = this.app.renderer;
 
-        let zoomController = new ZoomControllerUI();
+        let zoomController = new ZoomControllerUI(this);
         zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
 
         zoomController.on('expand', () => {
@@ -273,7 +273,7 @@ class Minimap extends utils.EventEmitter {
 
         canvas.addEventListener('wheel', e => {
             e.preventDefault();
-            this.zoom += e.deltaY * -0.01;
+            this.zoom += e.deltaY * -0.005;
         });
     }
 
@@ -305,6 +305,7 @@ class Minimap extends utils.EventEmitter {
         this.background.height = this.size * value;
 
         this._invalidate();
+        this.emit('zoomChange');
     }
 
     get center() {
