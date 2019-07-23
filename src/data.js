@@ -161,7 +161,7 @@ function normalizeData(logs, ratio) {
             return data.players[accountId];
         }
 
-            data.players[accountId] = {
+        data.players[accountId] = {
             accountId,
             name: null,
             teamId: 0,
@@ -315,263 +315,263 @@ function normalizeData(logs, ratio) {
         let elapsedTime = logTime - startTime;
 
         switch (type) {
-            case 'LogArmorDestroy': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                addPlayerLocation(log.victim, elapsedTime);
-                break;
+        case 'LogArmorDestroy': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogCarePackageLand': {
-                let itemPackage = log.itemPackage;
+            addPlayerLocation(log.victim, elapsedTime);
+            break;
+        }
 
-                let landLocation = {
-                    x: itemPackage.location.x,
-                    y: itemPackage.location.y,
-                };
+        case 'LogCarePackageLand': {
+            let itemPackage = log.itemPackage;
 
-                data.carePackages[carePackageLandIndex].landLocation = normalizeLocation(landLocation);
-                data.carePackages[carePackageLandIndex].landTime = elapsedTime;
-                carePackageLandIndex++;
-                break;
+            let landLocation = {
+                x: itemPackage.location.x,
+                y: itemPackage.location.y,
+            };
+
+            data.carePackages[carePackageLandIndex].landLocation = normalizeLocation(landLocation);
+            data.carePackages[carePackageLandIndex].landTime = elapsedTime;
+            carePackageLandIndex++;
+            break;
+        }
+
+        case 'LogCarePackageSpawn': {
+            let itemPackage = log.itemPackage;
+
+            let spawnLocation = {
+                x: itemPackage.location.x,
+                y: itemPackage.location.y,
+            };
+
+            data.carePackages.push({
+                spawnTime: elapsedTime,
+                spawnLocation: normalizeLocation(spawnLocation),
+
+                landTime: null,
+                landLocation: null,
+
+                items: itemPackage.items,
+            });
+
+            break;
+        }
+
+        case 'LogGameStatePeriodic': {
+            let gameState = log.gameState;
+
+            addWhiteCircle(gameState.poisonGasWarningPosition, gameState.poisonGasWarningRadius, elapsedTime);
+            addSafetyZone(gameState.safetyZonePosition, gameState.safetyZoneRadius, elapsedTime);
+            addRedZone(gameState.redZonePosition, gameState.redZoneRadius, elapsedTime);
+            addAlivePlayers(gameState.numAlivePlayers, elapsedTime);
+            break;
+        }
+
+        case 'LogHeal': {
+            addPlayerLocation(log.character, elapsedTime);
+            addPlayerHealth(log.character, log.character.health, enums.PlayerState.ALIVE, elapsedTime);
+            break;
+        }
+
+        case 'LogItemAttach': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemDetach': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemDrop': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemEquip': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemPickup': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemPickupFromCarepackage': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemPickupFromLootbox': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemUnequip': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogItemUse': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogMatchDefinition': {
+            break;
+        }
+
+        case 'LogMatchEnd': {
+            for (let character of log.characters) {
+                let player = getPlayer(character.accountId);
+
+                player.name = character.name;
+                player.teamId = character.teamId;
+                player.ranking = character.ranking;
             }
 
-            case 'LogCarePackageSpawn': {
-                let itemPackage = log.itemPackage;
+            data.meta.duration = elapsedTime;
+            break;
+        }
 
-                let spawnLocation = {
-                    x: itemPackage.location.x,
-                    y: itemPackage.location.y,
-                };
+        // Already handle LogMatchStart
+        // case 'LogMatchStart': {
+        //     break;
+        // }
 
-                data.carePackages.push({
-                    spawnTime: elapsedTime,
-                    spawnLocation: normalizeLocation(spawnLocation),
+        case 'LogObjectDestroy': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
 
-                    landTime: null,
-                    landLocation: null,
+        case 'LogParachuteLanding': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
 
-                    items: itemPackage.items,
-                });
-
-                break;
+        case 'LogPlayerAttack': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogGameStatePeriodic': {
-                let gameState = log.gameState;
+            break;
+        }
 
-                addWhiteCircle(gameState.poisonGasWarningPosition, gameState.poisonGasWarningRadius, elapsedTime);
-                addSafetyZone(gameState.safetyZonePosition, gameState.safetyZoneRadius, elapsedTime);
-                addRedZone(gameState.redZonePosition, gameState.redZoneRadius, elapsedTime);
-                addAlivePlayers(gameState.numAlivePlayers, elapsedTime);
-                break;
+        case 'LogPlayerCreate': {
+            break;
+        }
+
+        case 'LogPlayerKill': {
+            if (isPlayer(log.killer)) {
+                addPlayerLocation(log.killer, elapsedTime);
             }
 
-            case 'LogHeal': {
-                addPlayerLocation(log.character, elapsedTime);
-                addPlayerHealth(log.character, log.character.health, enums.PlayerState.ALIVE, elapsedTime);
-                break;
+            addPlayerLocation(log.victim, elapsedTime);
+            addPlayerHealth(log.victim, 0, enums.PlayerState.DEAD, elapsedTime);
+
+            if (isPlayer(log.assistant)) {
+                addPlayerLocation(log.assistant, elapsedTime);
+            }
+            break;
+        }
+
+        case 'LogPlayerLogin': {
+            break;
+        }
+
+        case 'LogPlayerLogout': {
+            break;
+        }
+
+        case 'LogPlayerMakeGroggy': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogItemAttach': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
+            addPlayerLocation(log.victim, elapsedTime);
+            addPlayerHealth(log.victim, 0, enums.PlayerState.GROGGY, elapsedTime);
+            break;
+        }
+
+        case 'LogPlayerPosition': {
+            addPlayerLocation(log.character, elapsedTime);
+            addAlivePlayers(log.numAlivePlayers, elapsedTime);
+            break;
+        }
+
+        case 'LogPlayerRevive': {
+            addPlayerLocation(log.reviver, elapsedTime);
+            addPlayerLocation(log.victim, elapsedTime);
+
+            addPlayerHealth(log.victim, log.victim.health, enums.PlayerState.ALIVE, elapsedTime);
+            break;
+        }
+
+        case 'LogPlayerTakeDamage': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogItemDetach': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
+            addPlayerLocation(log.victim, elapsedTime);
+            addPlayerHealth(log.victim, log.victim.health - log.damage, null, elapsedTime);
+            break;
+        }
+
+        case 'LogRedZoneEnded': {
+            for (let driver of log.drivers) {
+                addPlayerLocation(driver, elapsedTime);
+            }
+            break;
+        }
+
+        case 'LogSwimEnd': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogSwimStart': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogVaultStart': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogVehicleDestroy': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogItemDrop': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
+            break;
+        }
+
+        case 'LogVehicleLeave': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogVehicleRide': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogWeaponFireCount': {
+            addPlayerLocation(log.character, elapsedTime);
+            break;
+        }
+
+        case 'LogWheelDestroy': {
+            if (isPlayer(log.attacker)) {
+                addPlayerLocation(log.attacker, elapsedTime);
             }
 
-            case 'LogItemEquip': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogItemPickup': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogItemPickupFromCarepackage': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogItemPickupFromLootbox': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogItemUnequip': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogItemUse': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogMatchDefinition': {
-                break;
-            }
-
-            case 'LogMatchEnd': {
-                for (let character of log.characters) {
-                    let player = getPlayer(character.accountId);
-
-                    player.name = character.name;
-                    player.teamId = character.teamId;
-                    player.ranking = character.ranking;
-                }
-
-                data.meta.duration = elapsedTime;
-                break;
-            }
-
-            // Already handle LogMatchStart
-            // case 'LogMatchStart': {
-            //     break;
-            // }
-
-            case 'LogObjectDestroy': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogParachuteLanding': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogPlayerAttack': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                break;
-            }
-
-            case 'LogPlayerCreate': {
-                break;
-            }
-
-            case 'LogPlayerKill': {
-                if (isPlayer(log.killer)) {
-                    addPlayerLocation(log.killer, elapsedTime);
-                }
-
-                addPlayerLocation(log.victim, elapsedTime);
-                addPlayerHealth(log.victim, 0, enums.PlayerState.DEAD, elapsedTime);
-
-                if (isPlayer(log.assistant)) {
-                    addPlayerLocation(log.assistant, elapsedTime);
-                }
-                break;
-            }
-
-            case 'LogPlayerLogin': {
-                break;
-            }
-
-            case 'LogPlayerLogout': {
-                break;
-            }
-
-            case 'LogPlayerMakeGroggy': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                addPlayerLocation(log.victim, elapsedTime);
-                addPlayerHealth(log.victim, 0, enums.PlayerState.GROGGY, elapsedTime);
-                break;
-            }
-
-            case 'LogPlayerPosition': {
-                addPlayerLocation(log.character, elapsedTime);
-                addAlivePlayers(log.numAlivePlayers, elapsedTime);
-                break;
-            }
-
-            case 'LogPlayerRevive': {
-                addPlayerLocation(log.reviver, elapsedTime);
-                addPlayerLocation(log.victim, elapsedTime);
-
-                addPlayerHealth(log.victim, log.victim.health, enums.PlayerState.ALIVE, elapsedTime);
-                break;
-            }
-
-            case 'LogPlayerTakeDamage': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                addPlayerLocation(log.victim, elapsedTime);
-                addPlayerHealth(log.victim, log.victim.health - log.damage, null, elapsedTime);
-                break;
-            }
-
-            case 'LogRedZoneEnded': {
-                for (let driver of log.drivers) {
-                    addPlayerLocation(driver, elapsedTime);
-                }
-                break;
-            }
-
-            case 'LogSwimEnd': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogSwimStart': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogVaultStart': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogVehicleDestroy': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                break;
-            }
-
-            case 'LogVehicleLeave': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogVehicleRide': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogWeaponFireCount': {
-                addPlayerLocation(log.character, elapsedTime);
-                break;
-            }
-
-            case 'LogWheelDestroy': {
-                if (isPlayer(log.attacker)) {
-                    addPlayerLocation(log.attacker, elapsedTime);
-                }
-
-                break;
-            }
+            break;
+        }
         }
     }
 
