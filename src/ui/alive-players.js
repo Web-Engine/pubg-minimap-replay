@@ -8,12 +8,12 @@ class AlivePlayersUI extends Container {
         this._data = data;
 
         let leftBox = new Graphics();
-        leftBox.beginFill(0xa1a1a1, 0.7);
+        leftBox.beginFill(0xa1a1a1, 0.9);
         leftBox.drawRect(0, 0, 50, 40);
         leftBox.endFill();
 
         let rightBox = new Graphics();
-        rightBox.beginFill(0x424242, 0.7);
+        rightBox.beginFill(0x424242, 0.9);
         rightBox.drawRect(50, 0, 100, 40);
         rightBox.endFill();
 

@@ -1,6 +1,7 @@
 import { Text, Graphics } from 'pixi.js';
 import { calcPointRatio, findCurrentState } from '../utils';
 import Component from './component';
+import { enums } from './../data';
 
 class Player extends Component {
     constructor(minimap, data) {
@@ -54,6 +55,20 @@ class Player extends Component {
                 showName = false;
             }
         });
+
+        this._state = enums.PlayerState.ALIVE;
+
+        this.redrawCircle();
+    }
+
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+        if (this._state === value) return;
+
+        this.redrawCircle();
     }
 
     get health() {
@@ -65,29 +80,44 @@ class Player extends Component {
 
         this._health = value;
 
+        this.redrawCircle();
+    }
+
+    redrawCircle() {
         this.circle.clear();
 
-        if (value === 0) {
-            this.circle.lineStyle(1);
-            this.circle.beginFill(0xFF0000);
-            this.circle.drawCircle(0, 0, 10);
-            this.circle.endFill();
-            this.circle.lineStyle(0);
-        }
-        else {
+        switch (this.state) {
+        case enums.PlayerState.ALIVE:
             this.circle.beginFill(0xFF0000);
             this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, Math.PI * value / 50, Math.PI * 2);
+            this.circle.arc(0, 0, 10, Math.PI * this.health / 50, Math.PI * 2);
             this.circle.endFill();
 
             this.circle.beginFill(0xFFFFFF);
             this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, 0, Math.PI * value / 50);
+            this.circle.arc(0, 0, 10, 0, Math.PI * this.health / 50);
             this.circle.endFill();
 
             this.circle.lineStyle(1);
             this.circle.drawCircle(0, 0, 10);
             this.circle.lineStyle(0);
+            break;
+
+        case enums.PlayerState.GROGGY:
+            this.circle.lineStyle(1);
+            this.circle.beginFill(0xFFFF00);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.endFill();
+            this.circle.lineStyle(0);
+            break;
+
+        case enums.PlayerState.DEAD:
+            this.circle.lineStyle(1);
+            this.circle.beginFill(0xFF0000);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.endFill();
+            this.circle.lineStyle(0);
+            break;
         }
     }
 
@@ -121,12 +151,9 @@ class Player extends Component {
     updateHealth(time) {
         let { before } = findCurrentState(this.healths, time);
 
-        let health = 100;
-        if (before) {
-            health = before.health;
-        }
-
-        this.health = health;
+        this._health = before.health;
+        this._state = before.state;
+        this.redrawCircle();
     }
 }
 

@@ -4,7 +4,7 @@ import WhiteCircle from './components/white-circle';
 import RedZone from './components/red-zone';
 import SafetyZone from './components/safety-zone';
 import CarePackage from './components/care-package';
-import { normalizeData } from './utils';
+import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
@@ -58,8 +58,6 @@ class Minimap extends utils.EventEmitter {
             height: this.size,
             antialias: true,
         });
-
-        this.app.stage.size = this.size;
     }
 
     _initializeUI() {
@@ -87,7 +85,7 @@ class Minimap extends utils.EventEmitter {
     _initializeZoomControllerUI() {
         let renderer = this.app.renderer;
 
-        let zoomController = new ZoomControllerUI();
+        let zoomController = new ZoomControllerUI(this);
         zoomController.position.set(renderer.width - zoomController.width - 20, renderer.height - zoomController.height - 20);
 
         zoomController.on('expand', () => {
@@ -195,6 +193,7 @@ class Minimap extends utils.EventEmitter {
 
     _initializeEvents() {
         this._initializeMouseMove();
+        this._initializeMouseWheel();
     }
 
     _initializeMouseMove() {
@@ -267,6 +266,15 @@ class Minimap extends utils.EventEmitter {
         });
     }
 
+    _initializeMouseWheel() {
+        let canvas = this.app.view;
+
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            this.zoom += e.deltaY * -0.005;
+        });
+    }
+
     _initializeTimer() {
         this.app.ticker.add(delta => {
             let nextTime = this.currentTime + 1000 * delta / 60 * this.speed;
@@ -286,21 +294,24 @@ class Minimap extends utils.EventEmitter {
         return this._zoom;
     }
 
-    get center() {
-        return this._center;
-    }
-
-    set center(value) {
-        this._center.set(value.x, value.y);
-    }
-
     set zoom(value) {
+        if (value < 1) value = 1;
+
         this._zoom = value;
 
         this.background.width = this.size * value;
         this.background.height = this.size * value;
 
         this._invalidate();
+        this.emit('zoomChange');
+    }
+
+    get center() {
+        return this._center;
+    }
+
+    set center(value) {
+        this._center.set(value.x, value.y);
     }
 
     get speed() {
@@ -364,7 +375,6 @@ class Minimap extends utils.EventEmitter {
         this._isPlaying = true;
         this.app.start();
     }
-
 
     pause() {
         this._isPlaying = false;
