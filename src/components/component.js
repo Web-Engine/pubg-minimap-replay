@@ -5,10 +5,6 @@ class Component extends Container {
         super();
 
         this.minimap = minimap;
-
-        this.minimap.on('invalidate', () => {
-            this.seek(this.minimap.currentTime);
-        });
     }
 
     seek() {}
