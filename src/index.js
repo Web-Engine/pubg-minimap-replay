@@ -144,7 +144,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer.addChild(safetyZone);
         this.componentLayer.addChild(redZone);
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             whiteCircle.seek(this.currentTime);
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
@@ -164,7 +164,7 @@ class Minimap extends utils.EventEmitter {
             playersContainer.addChild(player);
         }
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             for (let player of players) {
                 player.seek(this.currentTime);
             }
@@ -184,7 +184,7 @@ class Minimap extends utils.EventEmitter {
             carePackagesContainer.addChild(carePackage);
         }
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             for (let carePackage of carePackages) {
                 carePackage.seek(this.currentTime);
             }
@@ -277,6 +277,8 @@ class Minimap extends utils.EventEmitter {
 
     _initializeTimer() {
         this.app.ticker.add(delta => {
+            if (!this.isPlaying) return;
+
             let nextTime = this.currentTime + 1000 * delta / 60 * this.speed;
 
             if (nextTime >= this.data.meta.duration) {
@@ -361,24 +363,27 @@ class Minimap extends utils.EventEmitter {
     }
 
     set isPlaying(value) {
-        if (value) {
-            this.play();
-        }
-        else {
-            this.pause();
-        }
+        this._isPlaying = value;
+
+        this.emit('playStateChange');
+        // if (value) {
+        //     this.play();
+        // }
+        // else {
+        //     this.pause();
+        // }
     }
     // endregion
 
     // region Methods
     play() {
-        this._isPlaying = true;
-        this.app.start();
+        this.isPlaying = true;
+        // this.app.start();
     }
 
     pause() {
-        this._isPlaying = false;
-        this.app.stop();
+        this.isPlaying = false;
+        // this.app.stop();
     }
 
     _invalidate() {
@@ -386,9 +391,6 @@ class Minimap extends utils.EventEmitter {
         let y = -(this.size * this.zoom) * this.center.y + this.size / 2;
 
         this.componentLayer.position.set(x, y);
-        this.emit('invalidate');
-
-        this.app.render();
     }
     // endregion
 }
