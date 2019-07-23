@@ -25,6 +25,37 @@ class Player extends Component {
         this.addChild(text);
 
         this.health = 100;
+
+        this.interactive = true;
+        this.buttonMode = true;
+
+        let showName = false;
+
+        let nameText = new Text(this.name, { fontSize: 16, fill: 'white'});
+        nameText.anchor.set(0.5, 0.5);
+        nameText.position.set(0,-(nameText.height / 2 + 14));
+        nameText.zIndex = 1;
+
+        let nameBox = new Graphics();
+        nameBox.lineStyle(0.8, 0xffffff,0.7);
+        nameBox.beginFill(0x000000, 0.6);
+        nameBox.drawRoundedRect(-(nameText.width / 2 + 2),-(nameText.height + 16), nameText.width + 4,nameText.height + 4, 5);
+        nameBox.endFill();
+        nameBox.zIndex = 1;
+
+        this.on('click', () => {
+            if(showName === false) {
+                this.addChild(nameBox);
+                this.addChild(nameText);
+                showName = true;
+            }
+            else {
+                this.removeChild(nameBox);
+                this.removeChild(nameText);
+                showName = false;
+            }
+        });
+
         this._state = enums.PlayerState.ALIVE;
 
         this.redrawCircle();
