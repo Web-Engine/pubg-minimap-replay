@@ -58,8 +58,6 @@ class Minimap extends utils.EventEmitter {
             height: this.size,
             antialias: true,
         });
-
-        this.app.stage.size = this.size;
     }
 
     _initializeUI() {
