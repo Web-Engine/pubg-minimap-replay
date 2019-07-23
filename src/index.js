@@ -386,24 +386,16 @@ class Minimap extends utils.EventEmitter {
         this._isPlaying = value;
 
         this.emit('playStateChange');
-        // if (value) {
-        //     this.play();
-        // }
-        // else {
-        //     this.pause();
-        // }
     }
     // endregion
 
     // region Methods
     play() {
         this.isPlaying = true;
-        // this.app.start();
     }
 
     pause() {
         this.isPlaying = false;
-        // this.app.stop();
     }
 
     _invalidate() {
