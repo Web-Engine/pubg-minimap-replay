@@ -304,6 +304,26 @@ class Minimap extends utils.EventEmitter {
         this.background.width = this.size * value;
         this.background.height = this.size * value;
 
+        let size = 1 / this.zoom;
+        let halfSize = size / 2;
+
+        let { x, y } = this.center;
+        if (x - halfSize < 0) {
+            x = halfSize;
+        }
+        else if (x + halfSize > 1) {
+            x = 1 - halfSize;
+        }
+
+        if (y - halfSize < 0) {
+            y = halfSize;
+        }
+        else if (y + halfSize > 1) {
+            y = 1 - halfSize;
+        }
+
+        this.center.set(x, y);
+
         this._invalidate();
         this.emit('zoomChange');
     }
