@@ -12,6 +12,7 @@ class ZoomControllerUI extends Container {
         let zoomDisplayBox = new Graphics();
         let zoomDisplayText = new Text('1.0x', { fontSize: 13, fill: 0xffffff });
 
+        zoomDisplayBox.lineStyle(1, 0xffffff);
         zoomDisplayBox.beginFill(0x939393, 0.9);
         zoomDisplayBox.drawRect(30, 0, 40, 30);
         zoomDisplayBox.endFill();

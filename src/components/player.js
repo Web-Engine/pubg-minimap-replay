@@ -1,6 +1,7 @@
 import { Text, Graphics } from 'pixi.js';
 import { calcPointRatio, findCurrentState } from '../utils';
 import Component from './component';
+import { enums } from './../data';
 
 class Player extends Component {
     constructor(minimap, data) {
@@ -24,6 +25,49 @@ class Player extends Component {
         this.addChild(text);
 
         this.health = 100;
+
+        this.interactive = true;
+        this.buttonMode = true;
+
+        let showName = false;
+
+        let nameText = new Text(this.name, { fontSize: 16, fill: 'white' });
+        nameText.anchor.set(0.5, 0.5);
+        nameText.position.set(0, -(nameText.height / 2 + 14));
+        nameText.zIndex = 1;
+
+        let nameBox = new Graphics();
+        nameBox.lineStyle(0.8, 0xffffff, 0.7);
+        nameBox.beginFill(0x000000, 0.6);
+        nameBox.drawRoundedRect(-(nameText.width / 2 + 2), -(nameText.height + 16), nameText.width + 4, nameText.height + 4, 5);
+        nameBox.endFill();
+        nameBox.zIndex = 1;
+
+        nameText.visible = false;
+        nameBox.visible = false;
+
+        this.addChild(nameBox);
+        this.addChild(nameText);
+
+        this.on('click', () => {
+            showName = !showName;
+            nameText.visible = showName;
+            nameBox.visible = showName;
+        });
+
+        this._state = enums.PlayerState.ALIVE;
+
+        this.redrawCircle();
+    }
+
+    get state() {
+        return this._state;
+    }
+
+    set state(value) {
+        if (this._state === value) return;
+
+        this.redrawCircle();
     }
 
     get health() {
@@ -35,29 +79,44 @@ class Player extends Component {
 
         this._health = value;
 
+        this.redrawCircle();
+    }
+
+    redrawCircle() {
         this.circle.clear();
 
-        if (value === 0) {
-            this.circle.lineStyle(1);
-            this.circle.beginFill(0xFF0000);
-            this.circle.drawCircle(0, 0, 10);
-            this.circle.endFill();
-            this.circle.lineStyle(0);
-        }
-        else {
+        switch (this.state) {
+        case enums.PlayerState.ALIVE:
             this.circle.beginFill(0xFF0000);
             this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, Math.PI * value / 50, Math.PI * 2);
+            this.circle.arc(0, 0, 10, Math.PI * this.health / 50, Math.PI * 2);
             this.circle.endFill();
 
             this.circle.beginFill(0xFFFFFF);
             this.circle.moveTo(0, 0);
-            this.circle.arc(0, 0, 10, 0, Math.PI * value / 50);
+            this.circle.arc(0, 0, 10, 0, Math.PI * this.health / 50);
             this.circle.endFill();
 
             this.circle.lineStyle(1);
             this.circle.drawCircle(0, 0, 10);
             this.circle.lineStyle(0);
+            break;
+
+        case enums.PlayerState.GROGGY:
+            this.circle.lineStyle(1);
+            this.circle.beginFill(0xFFFF00);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.endFill();
+            this.circle.lineStyle(0);
+            break;
+
+        case enums.PlayerState.DEAD:
+            this.circle.lineStyle(1);
+            this.circle.beginFill(0xFF0000);
+            this.circle.drawCircle(0, 0, 10);
+            this.circle.endFill();
+            this.circle.lineStyle(0);
+            break;
         }
     }
 
@@ -91,12 +150,9 @@ class Player extends Component {
     updateHealth(time) {
         let { before } = findCurrentState(this.healths, time);
 
-        let health = 100;
-        if (before) {
-            health = before.health;
-        }
-
-        this.health = health;
+        this._health = before.health;
+        this._state = before.state;
+        this.redrawCircle();
     }
 }
 

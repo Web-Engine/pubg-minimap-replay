@@ -4,7 +4,7 @@ import WhiteCircle from './components/white-circle';
 import RedZone from './components/red-zone';
 import SafetyZone from './components/safety-zone';
 import CarePackage from './components/care-package';
-import { normalizeData } from './utils';
+import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
@@ -58,8 +58,6 @@ class Minimap extends utils.EventEmitter {
             height: this.size,
             antialias: true,
         });
-
-        this.app.stage.size = this.size;
     }
 
     _initializeUI() {
@@ -146,7 +144,7 @@ class Minimap extends utils.EventEmitter {
         this.componentLayer.addChild(safetyZone);
         this.componentLayer.addChild(redZone);
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             whiteCircle.seek(this.currentTime);
             redZone.seek(this.currentTime);
             safetyZone.seek(this.currentTime);
@@ -166,7 +164,7 @@ class Minimap extends utils.EventEmitter {
             playersContainer.addChild(player);
         }
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             for (let player of players) {
                 player.seek(this.currentTime);
             }
@@ -186,7 +184,7 @@ class Minimap extends utils.EventEmitter {
             carePackagesContainer.addChild(carePackage);
         }
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             for (let carePackage of carePackages) {
                 carePackage.seek(this.currentTime);
             }
@@ -297,6 +295,8 @@ class Minimap extends utils.EventEmitter {
 
     _initializeTimer() {
         this.app.ticker.add(delta => {
+            if (!this.isPlaying) return;
+
             let nextTime = this.currentTime + 1000 * delta / 60 * this.speed;
 
             if (nextTime >= this.data.meta.duration) {
@@ -321,6 +321,26 @@ class Minimap extends utils.EventEmitter {
 
         this.background.width = this.size * value;
         this.background.height = this.size * value;
+
+        let size = 1 / this.zoom;
+        let halfSize = size / 2;
+
+        let { x, y } = this.center;
+        if (x - halfSize < 0) {
+            x = halfSize;
+        }
+        else if (x + halfSize > 1) {
+            x = 1 - halfSize;
+        }
+
+        if (y - halfSize < 0) {
+            y = halfSize;
+        }
+        else if (y + halfSize > 1) {
+            y = 1 - halfSize;
+        }
+
+        this.center.set(x, y);
 
         this._invalidate();
         this.emit('zoomChange');
@@ -381,25 +401,19 @@ class Minimap extends utils.EventEmitter {
     }
 
     set isPlaying(value) {
-        if (value) {
-            this.play();
-        }
-        else {
-            this.pause();
-        }
+        this._isPlaying = value;
+
+        this.emit('playStateChange');
     }
     // endregion
 
     // region Methods
     play() {
-        this._isPlaying = true;
-        this.app.start();
+        this.isPlaying = true;
     }
 
-
     pause() {
-        this._isPlaying = false;
-        this.app.stop();
+        this.isPlaying = false;
     }
 
     _invalidate() {
@@ -407,9 +421,6 @@ class Minimap extends utils.EventEmitter {
         let y = -(this.size * this.zoom) * this.center.y + this.size / 2;
 
         this.componentLayer.position.set(x, y);
-        this.emit('invalidate');
-
-        this.app.render();
     }
     // endregion
 }

@@ -16,6 +16,7 @@ class Button extends Container {
         this.buttonMode = true;
 
         let background = new Graphics();
+        background.lineStyle(1, 0xffffff);
         background.beginFill(backgroundColor, backgroundAlpha);
         background.drawRect(0, 0, width, height);
         background.endFill();
