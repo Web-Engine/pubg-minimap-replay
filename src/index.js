@@ -268,10 +268,28 @@ class Minimap extends utils.EventEmitter {
 
     _initializeMouseWheel() {
         let canvas = this.app.view;
+        let positionGapX, positionGapY, zoomValue;
 
         canvas.addEventListener('wheel', e => {
+            let mousePositionX = this.center.x - ((0.5 - e.clientX / this.size) / this.zoom);
+            let mousePositionY = this.center.y - ((0.5 - e.clientY / this.size) / this.zoom);
+
             e.preventDefault();
-            this.zoom += e.deltaY * -0.005;
+
+            zoomValue = e.deltaY * -0.005;
+
+            if (this.zoom + zoomValue < 1) return;
+
+            positionGapX = (mousePositionX - this.center.x) / (this.zoom + zoomValue);
+            positionGapY = (mousePositionY - this.center.y) / (this.zoom + zoomValue);
+
+            if (zoomValue > 0) {
+                this.center.set(this.center.x + positionGapX, this.center.y + positionGapY);
+            }
+            else {
+                this.center.set(this.center.x - positionGapX, this.center.y - positionGapY);
+            }
+            this.zoom += zoomValue;
         });
     }
 
