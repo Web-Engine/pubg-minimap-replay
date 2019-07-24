@@ -1,5 +1,5 @@
 import { Text, Graphics } from 'pixi.js';
-import { calcPointRatio, findCurrentState } from '../utils';
+import { calcPointRatio } from '../utils';
 import Component from './component';
 import { enums } from './../data';
 
@@ -11,8 +11,9 @@ class Player extends Component {
         this.name = data.name;
         this.teamId = data.teamId;
         this.accountId = data.accountId;
-        this.locations = data.locations;
-        this.healths = data.healths;
+
+        this.registerTimeData('location', data.locations);
+        this.registerTimeData('health', data.healths);
 
         let circle = new Graphics();
         this.addChild(circle);
@@ -56,6 +57,9 @@ class Player extends Component {
         });
 
         this._state = enums.PlayerState.ALIVE;
+
+        this._nextLocationIndex = 0;
+        this._nextHealthIndex = 0;
 
         this.redrawCircle();
     }
@@ -120,24 +124,24 @@ class Player extends Component {
         }
     }
 
-    seek(time) {
-        this.updatePosition(time);
-        this.updateHealth(time);
+    update() {
+        this.updateLocation();
+        this.updateHealth();
     }
 
-    updatePosition(time) {
-        let { before, after, ratio } = findCurrentState(this.locations, time);
+    updateLocation() {
+        let { before, after, ratio } = this.current('location');
 
         if (!before) {
-            this.x = -1000;
-            this.y = -1000;
+            this.visible = false;
             return;
         }
+
+        this.visible = true;
 
         if (!after) {
             let { x, y } = this.toScaledPoint(before.location);
             this.position.set(x, y);
-
             return;
         }
 
@@ -147,11 +151,19 @@ class Player extends Component {
         this.position.set(x, y);
     }
 
-    updateHealth(time) {
-        let { before } = findCurrentState(this.healths, time);
+    updateHealth() {
+        let { before } = this.current('health');
+
+        if (!before) {
+            this.visible = false;
+            return;
+        }
+
+        this.visible = true;
 
         this._health = before.health;
         this._state = before.state;
+
         this.redrawCircle();
     }
 }

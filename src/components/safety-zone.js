@@ -1,12 +1,12 @@
 import { Graphics } from 'pixi.js';
 import Component from './component';
-import { calcValueRatio, calcPointRatio, findCurrentState } from '../utils';
+import { calcValueRatio, calcPointRatio } from '../utils';
 
 class SafetyZone extends Component {
     constructor(minimap, data) {
         super(minimap);
 
-        this._data = data;
+        this.registerTimeData('safetyZone', data);
         this._radius = 0;
 
         let circle = new Graphics();
@@ -31,8 +31,8 @@ class SafetyZone extends Component {
         this._circle.drawCircle(0, 0, value);
     }
 
-    seek(time) {
-        let { before, after, ratio } = findCurrentState(this._data, time);
+    update() {
+        let { before, after, ratio } = this.current('safetyZone');
 
         if (!before) {
             this.position.set(-1000, -1000);

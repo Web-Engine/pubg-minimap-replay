@@ -77,7 +77,7 @@ class Minimap extends utils.EventEmitter {
 
         this.uiLayer.addChild(alivePlayers);
 
-        this.on('currentTimeChange', () => {
+        this.app.ticker.add(() => {
             alivePlayers.seek(this.currentTime);
         });
     }
@@ -117,6 +117,8 @@ class Minimap extends utils.EventEmitter {
         let componentLayer = new Container();
         this.componentLayer = componentLayer;
 
+        this.components = [];
+
         this.app.stage.addChild(componentLayer);
 
         this._initializeBackground();
@@ -140,15 +142,13 @@ class Minimap extends utils.EventEmitter {
         let redZone = new RedZone(this, this.data.redZone);
         let safetyZone = new SafetyZone(this, this.data.safetyZone);
 
+        this.components.push(whiteCircle);
+        this.components.push(redZone);
+        this.components.push(safetyZone);
+
         this.componentLayer.addChild(whiteCircle);
         this.componentLayer.addChild(safetyZone);
         this.componentLayer.addChild(redZone);
-
-        this.app.ticker.add(() => {
-            whiteCircle.seek(this.currentTime);
-            redZone.seek(this.currentTime);
-            safetyZone.seek(this.currentTime);
-        });
     }
 
     _initializePlayers() {
@@ -160,15 +160,10 @@ class Minimap extends utils.EventEmitter {
         for (let playerData of Object.values(this.data.players)) {
             let player = new Player(this, playerData);
             players.push(player);
+            this.components.push(player);
 
             playersContainer.addChild(player);
         }
-
-        this.app.ticker.add(() => {
-            for (let player of players) {
-                player.seek(this.currentTime);
-            }
-        });
     }
 
     _initializeCarePackages() {
@@ -180,15 +175,10 @@ class Minimap extends utils.EventEmitter {
         for (let carePackageData of this.data.carePackages) {
             let carePackage = new CarePackage(this, carePackageData);
             carePackages.push(carePackage);
+            this.components.push(carePackage);
 
             carePackagesContainer.addChild(carePackage);
         }
-
-        this.app.ticker.add(() => {
-            for (let carePackage of carePackages) {
-                carePackage.seek(this.currentTime);
-            }
-        });
     }
 
     _initializeEvents() {
@@ -276,6 +266,12 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeTimer() {
+        let seeked = false;
+
+        this.on('currentTimeChange', () => {
+            seeked = true;
+        });
+
         this.app.ticker.add(delta => {
             if (!this.isPlaying) return;
 
@@ -284,9 +280,23 @@ class Minimap extends utils.EventEmitter {
             if (nextTime >= this.data.meta.duration) {
                 nextTime = this.data.meta.duration;
                 this.pause();
+                return;
             }
 
-            this.currentTime = nextTime;
+            this._currentTime = nextTime;
+
+            if (seeked) {
+                for (let component of this.components) {
+                    component.seek(nextTime);
+                }
+
+                seeked = false;
+                return;
+            }
+
+            for (let component of this.components) {
+                component.next(nextTime);
+            }
         });
     }
     // endregion

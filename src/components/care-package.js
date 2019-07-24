@@ -25,7 +25,7 @@ class CarePackage extends Component {
         this.landTime = data.landTime;
     }
 
-    seek(time) {
+    update(time) {
         let { x, y } = this.toScaledPoint(this._data.spawnLocation);
         this.position.set(x, y);
 

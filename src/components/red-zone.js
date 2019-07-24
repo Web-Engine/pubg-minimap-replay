@@ -1,12 +1,11 @@
 import { Graphics } from 'pixi.js';
 import Component from './component';
-import { findCurrentState } from '../utils';
 
 class RedZone extends Component {
     constructor(minimap, data) {
         super(minimap);
 
-        this._data = data;
+        this.registerTimeData('redZone', data);
         this._radius = 0;
 
         let circle = new Graphics();
@@ -35,8 +34,8 @@ class RedZone extends Component {
         this._circle.endFill();
     }
 
-    seek(time) {
-        let { before } = findCurrentState(this._data, time);
+    update() {
+        let { before } = this.current('redZone');
 
         if (!before) {
             this.position.set(-1000, -1000);

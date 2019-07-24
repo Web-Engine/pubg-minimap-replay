@@ -1,3 +1,11 @@
+function calcRatio(before, after, time) {
+    if (!before || !after) return NaN;
+    if (before.elapsedTime === after.elapsedTime) return .5;
+
+    let difftime = after.elapsedTime - before.elapsedTime;
+    return (after.elapsedTime - time) / difftime;
+}
+
 function calcValueRatio(a, b, ratio) {
     return a * ratio + b * (1 - ratio);
 }
@@ -9,9 +17,14 @@ function calcPointRatio(a, b, ratio) {
     };
 }
 
-function findCurrentState(array, time) {
-    let left = 0;
-    let right = array.length - 1;
+function findCurrentState(array, time, left, right) {
+    if (left === undefined) {
+        left = 0;
+    }
+
+    if (right === undefined) {
+        right = array.length - 1;
+    }
 
     while (left <= right) {
         let mid = Math.floor((left + right) / 2);
@@ -20,6 +33,8 @@ function findCurrentState(array, time) {
             return {
                 before: array[mid],
                 after: array[mid + 1],
+                beforeIndex: mid,
+                afterIndex: mid + 1,
                 ratio: 1,
             };
         }
@@ -32,18 +47,14 @@ function findCurrentState(array, time) {
         }
     }
 
+    let beforeIndex = right;
+    let afterIndex = left;
     let before = array[right];
     let after = array[left];
 
-    if (!before || !after) {
-        return { before, after, ratio: NaN };
-    }
-
-    let difftime = after.elapsedTime - before.elapsedTime;
-    let ratio = (after.elapsedTime - time) / difftime;
-
-    return { before, after, ratio };
+    let ratio = calcRatio(before, after, time);
+    return { before, after, ratio, beforeIndex, afterIndex };
 }
 
 
-export { calcValueRatio, calcPointRatio, findCurrentState };
+export { calcRatio, calcValueRatio, calcPointRatio, findCurrentState };
