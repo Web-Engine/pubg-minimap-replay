@@ -1,4 +1,4 @@
-import { Sprite, Texture } from 'pixi.js';
+import { Sprite, Texture, Text, Graphics } from 'pixi.js';
 import Component from './component';
 import { Icon } from './../assets';
 
@@ -11,18 +11,57 @@ class CarePackage extends Component {
 
         this._data = data;
 
-        let sprite = new Sprite(FlyingTexture);
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
-        this._sprite = sprite;
+        let carePackage = new Sprite(FlyingTexture);
+        carePackage.anchor.x = 0.5;
+        carePackage.anchor.y = 0.5;
+        this._carePackage = carePackage;
 
-        this.addChild(sprite);
+        this.addChild(carePackage);
 
-        this.scale.x = .2;
-        this.scale.y = .2;
+        carePackage.scale.x = .2;
+        carePackage.scale.y = .2;
 
         this.spawnTime = data.spawnTime;
         this.landTime = data.landTime;
+
+        this.interactive = true;
+        this.buttonMode = true;
+
+        let items = '';
+        for (let numItem = 0; numItem < data.items.length; numItem++) {
+            items += data.items[numItem].itemName;
+
+            if (data.items[numItem].stackCount !== 1) {
+                items += ' ( ' + data.items[numItem].stackCount + ' )';
+            }
+            if (numItem !== data.items.length - 1) {
+                items += '\n';
+            }
+        }
+
+        let showName = false;
+
+        let itemNameText = new Text(items, { fontSize: 16, fill: 'white', align: 'center' });
+        itemNameText.anchor.set(0.5, 0.5);
+        itemNameText.position.set(0, -(itemNameText.height / 2));
+
+        let itemNameBox = new Graphics();
+        itemNameBox.lineStyle(0.8, 0xffffff, 0.7);
+        itemNameBox.beginFill(0x000000, 0.6);
+        itemNameBox.drawRoundedRect(-(itemNameText.width / 2 + 2), -(itemNameText.height), itemNameText.width + 4, itemNameText.height + 4, 5);
+        itemNameBox.endFill();
+
+        itemNameText.visible = false;
+        itemNameBox.visible = false;
+
+        this.addChild(itemNameBox);
+        this.addChild(itemNameText);
+
+        this.on('click', () => {
+            showName = !showName;
+            itemNameText.visible = showName;
+            itemNameBox.visible = showName;
+        });
     }
 
     update(time) {
@@ -30,7 +69,7 @@ class CarePackage extends Component {
         this.position.set(x, y);
 
         this.visible = this.spawnTime <= time;
-        this._sprite.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
+        this._carePackage.texture = this.landTime <= time ? NormalTexture : FlyingTexture;
     }
 }
 
