@@ -238,7 +238,7 @@ const itemNames = {
     'Item_Weapon_vz61Skorpion_C': 'Skorpion',
     'Item_Weapon_Win1894_C': 'Win94',
     'Item_Weapon_Winchester_C': 'S1897',
-    'WarModeStartParachutePack_C': 'Parachute'
+    'WarModeStartParachutePack_C': 'Parachute',
 };
 
 function back(array, index) {
@@ -405,6 +405,16 @@ function normalizeData(logs, ratio) {
         });
     }
 
+    function addPlayerAttack(attacker, victim, elapsedTime) {
+        if (attacker != null) {
+            data.playerAttacks.push({
+                attacker,
+                victim,
+                elapsedTime,
+            });
+        }
+    }
+
     {
         let i;
         for (i = 0; i < logs.length; i++) {
@@ -432,6 +442,7 @@ function normalizeData(logs, ratio) {
         safetyZone: [],
         carePackages: [],
         alivePlayers: [],
+        playerAttacks: [],
     };
 
     for (let character of matchStart.characters) {
@@ -655,6 +666,7 @@ function normalizeData(logs, ratio) {
 
             addPlayerLocation(log.victim, elapsedTime);
             addPlayerHealth(log.victim, log.victim.health - log.damage, null, elapsedTime);
+            addPlayerAttack(log.attacker, log.victim, elapsedTime);
             break;
         }
 

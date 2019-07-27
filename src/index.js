@@ -9,6 +9,7 @@ import AlivePlayersUI from './ui/alive-players';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
 import ObservablePoint from './observable/point';
+import PlayerAttack from './components/player-attack';
 
 const mapSize = 400000;
 
@@ -125,6 +126,7 @@ class Minimap extends utils.EventEmitter {
         this._initializeCircles();
         this._initializePlayers();
         this._initializeCarePackages();
+        this._initializePlayerAttacks();
     }
 
     _initializeBackground() {
@@ -178,6 +180,18 @@ class Minimap extends utils.EventEmitter {
             this.components.push(carePackage);
 
             carePackagesContainer.addChild(carePackage);
+        }
+    }
+
+    _initializePlayerAttacks() {
+        let playerAttackContainer = new Container();
+        this.componentLayer.addChild(playerAttackContainer);
+
+        for (let playerAttackData of this.data.playerAttacks) {
+            let playerAttack = new PlayerAttack(this, playerAttackData);
+            this.components.push(playerAttack);
+
+            playerAttackContainer.addChild(playerAttack);
         }
     }
 
