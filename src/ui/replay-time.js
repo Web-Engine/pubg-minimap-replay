@@ -22,8 +22,15 @@ class ReplayTimeUI extends Container {
     }
 
     seek(time) {
-        let currentTimeMin = Math.floor(time / 60000);
-        let currentTimeSec = Math.floor((time % 60000) / 1000);
+        let currentTimeMin = Math.floor(time / 60000).toString();
+        let currentTimeSec = Math.floor((time % 60000) / 1000).toString();
+
+        if (currentTimeMin.length < 2) {
+            currentTimeMin = '0' + currentTimeMin;
+        }
+        if (currentTimeSec.length < 2) {
+            currentTimeSec = '0' + currentTimeSec;
+        }
 
         this.currentReplayTimeText.text = currentTimeMin + ':' + currentTimeSec;
     }
