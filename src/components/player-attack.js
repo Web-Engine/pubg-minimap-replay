@@ -23,7 +23,7 @@ class PlayerAttack extends Component {
         let { x, y } = this.toScaledPoint(this.location);
         this.position.set(x, y);
 
-        this.visible = (this._data.elapsedTime <= time && time <= this._data.elapsedTime + 1);
+        this.visible = (this._data.elapsedTime <= time <= this._data.elapsedTime + 2000);
     }
 }
 
