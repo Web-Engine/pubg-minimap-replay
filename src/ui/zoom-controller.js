@@ -19,8 +19,8 @@ class ZoomControllerUI extends Container {
 
         zoomDisplayText.anchor.set(0.5, 0.5);
 
-        expandButton.position.set(0, 0);
-        contractButton.position.set(70, 0);
+        expandButton.position.set(70, 0);
+        contractButton.position.set(0, 0);
         zoomDisplayText.position.set(50, 15);
 
         this.addChild(expandButton);
