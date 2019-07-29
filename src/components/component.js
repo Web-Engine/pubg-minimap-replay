@@ -43,7 +43,6 @@ class Component extends Container {
         this.minimap = minimap;
 
         this._timeData = {};
-        this._currentData = {};
     }
 
     seek(time) {
