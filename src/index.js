@@ -95,6 +95,10 @@ class Minimap extends utils.EventEmitter {
         this.app.ticker.add(() => {
             replayTime.seek(this.currentTime);
         });
+
+        this.on('sizeChange', () => {
+            replayTime.position.set(renderer.width - replayTime.width - 20, 20);
+        });
     }
 
     _initializeZoomControllerUI() {
