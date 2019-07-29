@@ -62,7 +62,7 @@ const Icon = {
     },
 };
 
-function load(mapName, useHigh, callback)
+function loadTextures(mapName, useHigh, callback)
 {
     const loader = new Loader();
 
@@ -117,4 +117,4 @@ function load(mapName, useHigh, callback)
     });
 }
 
-export { load, Background, Icon };
+export { loadTextures, Background, Icon };

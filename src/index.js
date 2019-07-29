@@ -8,7 +8,7 @@ import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
 import ReplayTimeUI from './ui/replay-time';
 import ZoomControllerUI from './ui/zoom-controller';
-import { load, Background } from './assets';
+import { loadTextures, Background } from './assets';
 import ObservablePoint from './observable/point';
 import PlayerAttack from './components/player-attack';
 
@@ -95,7 +95,7 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeTextures() {
-        load(this.data.meta.mapName, this.options.useHighBackground, () => {
+        loadTextures(this.data.meta.mapName, this.options.useHighBackground, () => {
             this.emit('textureLoad');
         });
     }
