@@ -106,6 +106,14 @@ const mapNames = {
     Savage_Main: 'Sanhok',
 };
 
+const mapSizes = {
+    Desert_Main: 8000,
+    DihorOtok_Main: 6000,
+    Erangel_Main: 8000,
+    Range_Main: 2000,
+    Savage_Main: 4000,
+};
+
 const itemNames = {
     'Item_Ammo_12Guage_C': '12 Gauge Ammo',
     'Item_Ammo_300Magnum_C': '300 Magnum Ammo',
@@ -273,7 +281,7 @@ const enums = {
     },
 };
 
-function normalizeData(logs, ratio) {
+function normalizeData(logs) {
     function normalizeNumber(number) {
         return number * ratio;
     }
@@ -429,12 +437,15 @@ function normalizeData(logs, ratio) {
     }
 
     let matchStart = logs.shift();
+    let mapSize = mapSizes[matchStart.mapName];
+    let ratio = 1 / mapSize / 100;
 
     let data = {
         meta: {
             mapName: mapNames[matchStart.mapName],
             terrain: matchStart.mapName,
             duration: 0,
+            mapSize,
         },
         players: {},
         redZone: [],
