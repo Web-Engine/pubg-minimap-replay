@@ -435,6 +435,9 @@ class Minimap extends utils.EventEmitter {
     }
 
     set currentTime(value) {
+        value = Number(value);
+        if (isNaN(value)) return;
+
         this._currentTime = value;
 
         this.emit('currentTimeChange');
