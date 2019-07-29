@@ -490,6 +490,10 @@ class Minimap extends utils.EventEmitter {
 
         this.componentLayer.position.set(x, y);
     }
+
+    mount(parent) {
+        parent.appendChild(this.app.view);
+    }
     // endregion
 }
 

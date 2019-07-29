@@ -16,11 +16,13 @@
     function onDataLoad(data) {
         window.data = data;
 
-        window.replayer = new Replay.Minimap(data, {
+        var replayer = new Replay.Minimap(data, {
             size: 800,
         });
 
-        document.body.appendChild(replayer.app.view);
+        window.replayer = replayer;
+
+        replayer.mount(document.body);
     }
 </script>
 <script src="./data.jsonp.js"></script>
