@@ -12,8 +12,6 @@ import { Background } from './assets';
 import ObservablePoint from './observable/point';
 import PlayerAttack from './components/player-attack';
 
-const mapSize = 400000;
-
 class Minimap extends utils.EventEmitter {
     constructor(data, options = {}) {
         super();
@@ -30,7 +28,7 @@ class Minimap extends utils.EventEmitter {
 
     // region Initialize
     _initializeData(data) {
-        this.data = normalizeData(data, 1 / mapSize);
+        this.data = normalizeData(data);
     }
 
     _initializeOptions(options) {
