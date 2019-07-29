@@ -22,17 +22,15 @@ class ReplayTimeUI extends Container {
     }
 
     seek(time) {
-        let currentTimeMin = Math.floor(time / 60000).toString();
-        let currentTimeSec = Math.floor((time % 60000) / 1000).toString();
+        let seconds = Math.floor(time / 1000);
 
-        if (currentTimeMin.length < 2) {
-            currentTimeMin = '0' + currentTimeMin;
-        }
-        if (currentTimeSec.length < 2) {
-            currentTimeSec = '0' + currentTimeSec;
-        }
+        let minutes = Math.floor(seconds / 60);
+        seconds %= 60;
 
-        this.currentReplayTimeText.text = currentTimeMin + ':' + currentTimeSec;
+        seconds = seconds.toString().padStart(2, '0');
+        minutes = minutes.toString().padStart(2, '0');
+
+        this.currentReplayTimeText.text = `${minutes}:${seconds}`;
     }
 }
 
