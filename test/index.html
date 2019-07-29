@@ -5,7 +5,31 @@
     <title>Title</title>
 
     <style>
-        body { margin: 0; }
+        body { margin: 0; padding: 30px; }
+
+        .controller {
+            display: flex;
+            width: 800px;
+        }
+
+        #current-time {
+            display: block;
+            width: 600px;
+        }
+
+        #speed {
+            display: block;
+            width: 100px;
+        }
+
+        .buttons button {
+            display: block;
+            width: 100px;
+        }
+
+        #play {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -13,34 +37,46 @@
 <script src="../dist/bundle.js"></script>
 
 <div>
-    <input id="file" type="file">
+    <label>Select replay file: <input id="file" type="file"></label>
 
-    <button type="button">Pause</button>
-    <input id="current-time" type="range" min="0" max="1" value="0">
-    <input id="speed" type="range" min="1" max="10" value="10">
+    <div class="controller">
+        <div class="buttons">
+            <button id="play" type="button">Play</button>
+            <button id="pause" type="button">Pause</button>
+        </div>
+
+        <input id="current-time" type="range" min="0" max="1" step="0.1" value="0">
+        <input id="speed" type="range" min="1" max="30" step="0.5" value="10">
+    </div>
 </div>
 
 <div id="replay"></div>
 
 <script>
-    function onDataLoad(data) {
-        window.data = data;
-
-        var replayer = new Replay.Minimap(data, {
-            size: 800,
-        });
-
-        window.replayer = replayer;
-
-        replayer.mount(document.querySelector('#replay'));
-    }
-
     var file = document.querySelector('#file');
     var currentTime = document.querySelector('#current-time');
     var speed = document.querySelector('#speed');
+    var replay = document.querySelector('#replay');
+    var play = document.querySelector('#play');
+    var pause = document.querySelector('#pause');
+
+    var replayer = null;
+
+    function onDataLoad(data) {
+        window.data = data;
+
+        replayer = new Replay.Minimap(data, {
+            size: 800,
+        });
+        currentTime.max = replayer.data.meta.duration;
+
+        window.replayer = replayer;
+        replayer.mount(replay);
+    }
 
     file.addEventListener('change', function () {
         var reader = new FileReader();
+
         reader.onload = function(e) {
             var data = JSON.parse(e.target.result);
 
@@ -50,8 +86,36 @@
         reader.readAsText(file.files[0]);
     });
 
+    currentTime.addEventListener('input', function () {
+        if (replayer === null) return;
+
+        replayer.currentTime = currentTime.value;
+    });
+
+    speed.addEventListener('input', function () {
+        if (replayer === null) return;
+
+        replayer.speed = speed.value;
+    });
+
+    play.addEventListener('click', function () {
+        if (replayer === null) return;
+
+        pause.style.display = 'block';
+        play.style.display = 'none';
+
+        replayer.play();
+    });
+
+    pause.addEventListener('click', function () {
+        if (replayer === null) return;
+
+        play.style.display = 'block';
+        pause.style.display = 'none';
+
+        replayer.pause();
+    });
 </script>
-<!--<script src="./data.jsonp.js"></script>-->
 
 </body>
 </html>
