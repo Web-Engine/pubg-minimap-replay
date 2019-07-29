@@ -38,10 +38,55 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeOptions(options) {
-        options.size = options.size || 800;
-        options.useHighBackground = options.useHighBackground || true;
+        let {
+            size = 800,
+            useHighBackground = true,
+            showTimeUI = false,
+            showZoomController = true,
+            showAlivePlayers = true,
+            wheelZoom = true,
+            panDrag = true,
+        } = options;
 
-        this.options = options;
+        size = Number(size);
+
+        if (isNaN(size) || !Number.isInteger(size) || size <= 0) {
+            throw 'size option must be positive integer';
+        }
+
+        if (typeof useHighBackground !== 'boolean') {
+            throw 'useHighBackground option must be boolean';
+        }
+
+        if (typeof showTimeUI !== 'boolean') {
+            throw 'showTimeUI option must be boolean';
+        }
+
+        if (typeof showZoomController !== 'boolean') {
+            throw 'showZoomController option must be boolean';
+        }
+
+        if (typeof showAlivePlayers !== 'boolean') {
+            throw 'showAlivePlayers option must be boolean';
+        }
+
+        if (typeof wheelZoom !== 'boolean') {
+            throw 'wheelZoom option must be boolean';
+        }
+
+        if (typeof panDrag !== 'boolean') {
+            throw 'panDrag option must be boolean';
+        }
+
+        this.options = {
+            size,
+            useHighBackground,
+            showTimeUI,
+            showZoomController,
+            showAlivePlayers,
+            wheelZoom,
+            panDrag,
+        };
     }
 
     _initializeProperties() {
@@ -107,9 +152,17 @@ class Minimap extends utils.EventEmitter {
 
         this.app.stage.addChild(uiLayer);
 
-        this._initializeAlivePlayersUI();
-        this._initializeReplayTimeUI();
-        this._initializeZoomControllerUI();
+        if (this.options.showAlivePlayers) {
+            this._initializeAlivePlayersUI();
+        }
+
+        if (this.options.showTimeUI) {
+            this._initializeReplayTimeUI();
+        }
+
+        if (this.options.showZoomController) {
+            this._initializeZoomControllerUI();
+        }
     }
 
     _initializeAlivePlayersUI() {
@@ -261,8 +314,13 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeEvents() {
-        this._initializeMouseMove();
-        this._initializeMouseWheel();
+        if (this.options.panDrag) {
+            this._initializeMouseMove();
+        }
+
+        if (this.options.wheelZoom) {
+            this._initializeMouseWheel();
+        }
     }
 
     _initializeMouseMove() {
