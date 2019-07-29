@@ -6,24 +6,43 @@ class PlayerAttack extends Component {
         super(minimap);
 
         this._data = data;
-        this.location = {
-            x: (data.attacker.location.x + data.victim.location.x) / 2,
-            y: (data.attacker.location.y + data.victim.location.y) / 2,
-        };
+
+        this.attacker = data.attacker;
+        this.victim = data.victim;
 
         let playerAttack = new Graphics();
-        playerAttack.lineStyle(4, 0xff0000, 1);
-        playerAttack.moveTo(data.attacker.location.x, data.attacker.location.y);
-        playerAttack.lineTo(data.victim.location.x, data.victim.location.y);
-
+        this.playerAttack = playerAttack;
         this.addChild(playerAttack);
     }
 
-    update(time) {
-        let { x, y } = this.toScaledPoint(this.location);
-        this.position.set(x, y);
+    update(time)
+    {
+        this.playerAttack.clear();
+        this.playerAttack.lineStyle(1, 0xff0000);
+        {
+            let { x, y } = this.toScaledPoint(this.attacker.location);
+            this.playerAttack.moveTo(x, y);
 
-        this.visible = (this._data.elapsedTime <= time <= this._data.elapsedTime + 2000);
+            // if (this.attacker.teamId === 23) {
+            //     console.log('Attack', x, y);
+            // }
+        }
+
+        {
+            let { x, y } = this.toScaledPoint(this.victim.location);
+            this.playerAttack.lineTo(x, y);
+
+            // if (this.attacker.teamId === 23) {
+            //     console.log('Victim', x, y);
+            // }
+        }
+
+        this.visible = this._data.elapsedTime <= time && time <= this._data.elapsedTime + 2000;
+
+        // if (this.attacker.teamId === 23) {
+        //     console.log('Visible', this.visible);
+        //     console.log('');
+        // }
     }
 }
 

@@ -406,13 +406,17 @@ function normalizeData(logs, ratio) {
     }
 
     function addPlayerAttack(attacker, victim, elapsedTime) {
-        if (attacker != null) {
-            data.playerAttacks.push({
-                attacker,
-                victim,
-                elapsedTime,
-            });
-        }
+        if (attacker === null) return;
+
+        data.playerAttacks.push({
+            attacker: {
+                location: normalizeLocation(attacker.location),
+            },
+            victim: {
+                location: normalizeLocation(victim.location),
+            },
+            elapsedTime,
+        });
     }
 
     {
