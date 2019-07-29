@@ -39,6 +39,7 @@ class Minimap extends utils.EventEmitter {
 
     _initializeOptions(options) {
         options.size = options.size || 800;
+        options.useHighBackground = options.useHighBackground || true;
 
         this.options = options;
     }
@@ -94,7 +95,7 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeTextures() {
-        load(this.data.meta.mapName, () => {
+        load(this.data.meta.mapName, this.options.useHighBackground, () => {
             this.emit('textureLoad');
         });
     }
@@ -186,7 +187,15 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeBackground() {
-        const background = new Sprite(Background[this.data.meta.mapName].low);
+        let backgroundTexture;
+        if (this.options.useHighBackground) {
+            backgroundTexture = Background[this.data.meta.mapName].high;
+        }
+        else {
+            backgroundTexture = Background[this.data.meta.mapName].low;
+        }
+
+        const background = new Sprite(backgroundTexture);
         this.background = background;
 
         background.width = this.app.renderer.width;

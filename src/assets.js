@@ -62,7 +62,7 @@ const Icon = {
     },
 };
 
-function load(mapName, callback)
+function load(mapName, useHigh, callback)
 {
     const loader = new Loader();
 
@@ -78,8 +78,15 @@ function load(mapName, callback)
         loader.add('care-package-open', CarePackageOpen);
     }
 
-    if (!Background[mapName].low) {
-        loader.add(`background-${mapName}-low`, BackgroundAssets[mapName].low);
+    if (useHigh) {
+        if (!Background[mapName].high) {
+            loader.add('background', BackgroundAssets[mapName].high);
+        }
+    }
+    else {
+        if (!Background[mapName].low) {
+            loader.add('background', BackgroundAssets[mapName].low);
+        }
     }
 
     loader.load((loader, resources) => {
@@ -95,8 +102,15 @@ function load(mapName, callback)
             Icon.CarePackage.Open = resources['care-package-open'].texture;
         }
 
-        if (!Background[mapName].low) {
-            Background[mapName].low = resources[`background-${mapName}-low`].texture;
+        if (useHigh) {
+            if (!Background[mapName].high) {
+                Background[mapName].high = resources['background'].texture;
+            }
+        }
+        else {
+            if (!Background[mapName].low) {
+                Background[mapName].low = resources['background'].texture;
+            }
         }
 
         callback();
