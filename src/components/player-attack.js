@@ -18,6 +18,7 @@ class PlayerAttack extends Component {
     update(time) {
         this.playerAttack.clear();
         this.playerAttack.lineStyle(1, 0xff0000);
+
         {
             let { x, y } = this.toScaledPoint(this.attacker.location);
             this.playerAttack.moveTo(x, y);
@@ -28,7 +29,7 @@ class PlayerAttack extends Component {
             this.playerAttack.lineTo(x, y);
         }
 
-        this.visible = this.minimap.zoom >= 6 && this._data.elapsedTime <= time && time <= this._data.elapsedTime + 2000;
+        this.visible = this.minimap.zoom >= 6 && this._data.elapsedTime <= time && time <= this._data.elapsedTime + this.minimap.speed * 200;
     }
 }
 
