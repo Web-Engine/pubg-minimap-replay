@@ -324,14 +324,14 @@ class Minimap extends utils.EventEmitter {
         });
 
         this.app.ticker.add(delta => {
-            if (!this.isPlaying) return;
-
-            let nextTime = this.currentTime + 1000 * delta / 60 * this.speed;
+            let nextTime = this.currentTime;
+            if (this.isPlaying) {
+                nextTime += 1000 * delta / 60 * this.speed;
+            }
 
             if (nextTime >= this.data.meta.duration) {
                 nextTime = this.data.meta.duration;
                 this.pause();
-                return;
             }
 
             this._currentTime = nextTime;
