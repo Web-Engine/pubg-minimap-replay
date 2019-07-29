@@ -8,7 +8,7 @@ import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
 import ReplayTimeUI from './ui/replay-time';
 import ZoomControllerUI from './ui/zoom-controller';
-import { Background } from './assets';
+import { load, Background } from './assets';
 import ObservablePoint from './observable/point';
 import PlayerAttack from './components/player-attack';
 
@@ -20,10 +20,16 @@ class Minimap extends utils.EventEmitter {
         this._initializeOptions(options);
         this._initializeProperties();
         this._initializePIXI();
-        this._initializeComponents();
-        this._initializeUI();
-        this._initializeEvents();
-        this._initializeTimer();
+        this._initializeTextures();
+
+        this.on('textureLoad', () => {
+            this._initializeComponents();
+            this._initializeUI();
+            this._initializeEvents();
+            this._initializeTimer();
+
+            this.emit('load');
+        });
     }
 
     // region Initialize
@@ -84,6 +90,12 @@ class Minimap extends utils.EventEmitter {
             width: this.size,
             height: this.size,
             antialias: true,
+        });
+    }
+
+    _initializeTextures() {
+        load(this.data.meta.mapName, () => {
+            this.emit('textureLoad');
         });
     }
 
@@ -174,7 +186,7 @@ class Minimap extends utils.EventEmitter {
     }
 
     _initializeBackground() {
-        const background = new Sprite(Texture.from(Background[this.data.meta.mapName].low));
+        const background = new Sprite(Background[this.data.meta.mapName].low);
         this.background = background;
 
         background.width = this.app.renderer.width;

@@ -2,8 +2,8 @@ import { Sprite, Texture, Text, Graphics } from 'pixi.js';
 import Component from './component';
 import { Icon } from './../assets';
 
-const FlyingTexture = Texture.from(Icon.CarePackage.Flying);
-const NormalTexture = Texture.from(Icon.CarePackage.Normal);
+const FlyingTexture = Icon.CarePackage.Flying;
+const NormalTexture = Icon.CarePackage.Normal;
 
 class CarePackage extends Component {
     constructor(minimap, data) {
