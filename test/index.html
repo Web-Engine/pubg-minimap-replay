@@ -68,7 +68,12 @@
         replayer = new Replay.Minimap(data, {
             size: 800,
         });
+
         currentTime.max = replayer.data.meta.duration;
+
+        replayer.on('currentTimeChange', function () {
+            currentTime.value = replayer.currentTime;
+        });
 
         window.replayer = replayer;
         replayer.mount(replay);

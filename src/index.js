@@ -1,4 +1,4 @@
-import { Application, Texture, Sprite, utils, Container } from 'pixi.js';
+import { Application, Sprite, utils, Container } from 'pixi.js';
 import Player from './components/player';
 import WhiteCircle from './components/white-circle';
 import RedZone from './components/red-zone';
@@ -379,7 +379,10 @@ class Minimap extends utils.EventEmitter {
                 this.pause();
             }
 
-            this._currentTime = nextTime;
+            if (this._currentTime !== nextTime) {
+                this._currentTime = nextTime;
+                this.emit('currentTimeChange');
+            }
 
             if (seeked) {
                 for (let component of this.components) {
@@ -441,10 +444,6 @@ class Minimap extends utils.EventEmitter {
         this._currentTime = value;
 
         this.emit('currentTimeChange');
-
-        if (!this.isPlaying) {
-            this.app.render();
-        }
     }
 
     get size() {

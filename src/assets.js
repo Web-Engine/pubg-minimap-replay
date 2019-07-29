@@ -58,12 +58,11 @@ const Icon = {
     CarePackage: {
         Flying: null,
         Normal: null,
-        Open: null
+        Open: null,
     },
 };
 
-function loadTextures(mapName, useHigh, callback)
-{
+function loadTextures(mapName, useHigh, callback) {
     const loader = new Loader();
 
     if (!Icon.CarePackage.Flying) {
@@ -83,10 +82,8 @@ function loadTextures(mapName, useHigh, callback)
             loader.add('background', BackgroundAssets[mapName].high);
         }
     }
-    else {
-        if (!Background[mapName].low) {
-            loader.add('background', BackgroundAssets[mapName].low);
-        }
+    else if (!Background[mapName].low) {
+        loader.add('background', BackgroundAssets[mapName].low);
     }
 
     loader.load((loader, resources) => {
@@ -107,10 +104,8 @@ function loadTextures(mapName, useHigh, callback)
                 Background[mapName].high = resources['background'].texture;
             }
         }
-        else {
-            if (!Background[mapName].low) {
-                Background[mapName].low = resources['background'].texture;
-            }
+        else if (!Background[mapName].low) {
+            Background[mapName].low = resources['background'].texture;
         }
 
         callback();
