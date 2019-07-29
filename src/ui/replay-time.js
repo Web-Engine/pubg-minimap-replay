@@ -10,7 +10,7 @@ class ReplayTimeUI extends Container {
         timeDisplayBox.drawRect(0, 0, 50, 30);
         timeDisplayBox.endFill();
 
-        let currentReplayTimeText = new Text('0', { fontSize: 13, fill: 0xffffff });
+        let currentReplayTimeText = new Text('00:00', { fontSize: 13, fill: 0xffffff });
 
         currentReplayTimeText.anchor.set(0.5, 0.5);
         currentReplayTimeText.position.set(25, 15);
