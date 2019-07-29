@@ -12,6 +12,16 @@
 
 <script src="../dist/bundle.js"></script>
 
+<div>
+    <input id="file" type="file">
+
+    <button type="button">Pause</button>
+    <input id="current-time" type="range" min="0" max="1" value="0">
+    <input id="speed" type="range" min="1" max="10" value="10">
+</div>
+
+<div id="replay"></div>
+
 <script>
     function onDataLoad(data) {
         window.data = data;
@@ -22,10 +32,26 @@
 
         window.replayer = replayer;
 
-        replayer.mount(document.body);
+        replayer.mount(document.querySelector('#replay'));
     }
+
+    var file = document.querySelector('#file');
+    var currentTime = document.querySelector('#current-time');
+    var speed = document.querySelector('#speed');
+
+    file.addEventListener('change', function () {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var data = JSON.parse(e.target.result);
+
+            onDataLoad(data);
+        };
+
+        reader.readAsText(file.files[0]);
+    });
+
 </script>
-<script src="./data.jsonp.js"></script>
+<!--<script src="./data.jsonp.js"></script>-->
 
 </body>
 </html>
