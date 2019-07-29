@@ -6,6 +6,7 @@ import SafetyZone from './components/safety-zone';
 import CarePackage from './components/care-package';
 import { normalizeData } from './data';
 import AlivePlayersUI from './ui/alive-players';
+import ReplayTimeUI from './ui/replay-time';
 import ZoomControllerUI from './ui/zoom-controller';
 import { Background } from './assets';
 import ObservablePoint from './observable/point';
@@ -69,6 +70,7 @@ class Minimap extends utils.EventEmitter {
         this.app.stage.addChild(uiLayer);
 
         this._initializeAlivePlayersUI();
+        this._initializeReplayTimeUI();
         this._initializeZoomControllerUI();
     }
 
@@ -80,6 +82,23 @@ class Minimap extends utils.EventEmitter {
 
         this.app.ticker.add(() => {
             alivePlayers.seek(this.currentTime);
+        });
+    }
+
+    _initializeReplayTimeUI() {
+        let renderer = this.app.renderer;
+
+        let replayTime = new ReplayTimeUI();
+        replayTime.position.set(renderer.width - replayTime.width - 20, 20);
+
+        this.uiLayer.addChild(replayTime);
+
+        this.app.ticker.add(() => {
+            replayTime.seek(this.currentTime);
+        });
+
+        this.on('sizeChange', () => {
+            replayTime.position.set(renderer.width - replayTime.width - 20, 20);
         });
     }
 
