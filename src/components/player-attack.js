@@ -28,7 +28,7 @@ class PlayerAttack extends Component {
             this.playerAttack.lineTo(x, y);
         }
 
-        this.visible = this._data.elapsedTime <= time && time <= this._data.elapsedTime + 2000;
+        this.visible = this.minimap.zoom >= 6 && this._data.elapsedTime <= time && time <= this._data.elapsedTime + 2000;
     }
 }
 
