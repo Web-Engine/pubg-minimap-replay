@@ -409,12 +409,8 @@ function normalizeData(logs, ratio) {
         if (attacker === null) return;
 
         data.playerAttacks.push({
-            attacker: {
-                location: normalizeLocation(attacker.location),
-            },
-            victim: {
-                location: normalizeLocation(victim.location),
-            },
+            attacker: { location: normalizeLocation(attacker.location) },
+            victim: { location: normalizeLocation(victim.location) },
             elapsedTime,
         });
     }
