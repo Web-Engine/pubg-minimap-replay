@@ -42,7 +42,34 @@ class Minimap extends utils.EventEmitter {
 
         this._center = new ObservablePoint(.5, .5);
         this._center.on('change', () => {
+            let size = 1 / this.zoom;
+            let halfSize = size / 2;
+
+            let { x, y } = this.center;
+
+            if (x - halfSize < 0) {
+                x = halfSize;
+            }
+            else if (x + halfSize > 1) {
+                x = 1 - halfSize;
+            }
+
+            if (y - halfSize < 0) {
+                y = halfSize;
+            }
+            else if (y + halfSize > 1) {
+                y = 1 - halfSize;
+            }
+
+            if (x !== this.center.x || y !== this.center.y) {
+                this._center.set(x, y);
+            }
+
             this._invalidate();
+        });
+
+        this.on('zoomChange', () => {
+            this.center.set(this.center.x, this.center.y);
         });
 
         this._currentTime = 0;
@@ -289,28 +316,27 @@ class Minimap extends utils.EventEmitter {
 
     _initializeMouseWheel() {
         let canvas = this.app.view;
-        let positionGapX, positionGapY, zoomValue;
 
         canvas.addEventListener('wheel', e => {
-            let mousePositionX = this.center.x - ((0.5 - e.clientX / this.size) / this.zoom);
-            let mousePositionY = this.center.y - ((0.5 - e.clientY / this.size) / this.zoom);
-
             e.preventDefault();
 
-            zoomValue = e.deltaY * -0.005;
+            let renderer = this.app.renderer;
+            let { clientX, clientY } = e;
 
-            if (this.zoom + zoomValue < 1) return;
+            let mouseClientRatioX = clientX / renderer.width - 0.5;
+            let mouseClientRatioY = clientY / renderer.height - 0.5;
 
-            positionGapX = (mousePositionX - this.center.x) / (this.zoom + zoomValue);
-            positionGapY = (mousePositionY - this.center.y) / (this.zoom + zoomValue);
+            let mouseRatioX = mouseClientRatioX / this.zoom + this.center.x;
+            let mouseRatioY = mouseClientRatioY / this.zoom + this.center.y;
 
-            if (zoomValue > 0) {
-                this.center.set(this.center.x + positionGapX, this.center.y + positionGapY);
-            }
-            else {
-                this.center.set(this.center.x - positionGapX, this.center.y - positionGapY);
-            }
-            this.zoom += zoomValue;
+            let zoomValue = e.deltaY * -0.005;
+            let newZoom = this.zoom + zoomValue;
+
+            let centerX = mouseRatioX - mouseClientRatioX / newZoom;
+            let centerY = mouseRatioY - mouseClientRatioY / newZoom;
+
+            this.zoom = newZoom;
+            this.center.set(centerX, centerY);
         });
     }
 
@@ -362,26 +388,6 @@ class Minimap extends utils.EventEmitter {
 
         this.background.width = this.size * value;
         this.background.height = this.size * value;
-
-        let size = 1 / this.zoom;
-        let halfSize = size / 2;
-
-        let { x, y } = this.center;
-        if (x - halfSize < 0) {
-            x = halfSize;
-        }
-        else if (x + halfSize > 1) {
-            x = 1 - halfSize;
-        }
-
-        if (y - halfSize < 0) {
-            y = halfSize;
-        }
-        else if (y + halfSize > 1) {
-            y = 1 - halfSize;
-        }
-
-        this.center.set(x, y);
 
         this._invalidate();
         this.emit('zoomChange');
