@@ -112,7 +112,55 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     _initializeEvents() {
+        this._initializePanDrag();
 
+    }
+
+    _initializePanDrag() {
+        let centerStart = null;
+        let mouseStart = null;
+
+        this._background.interactive = true;
+
+        let move = e => {
+            let { x: mouseX, y: mouseY } = e.data.global;
+
+            let diffX = mouseX - mouseStart.x;
+            let diffY = mouseY - mouseStart.y;
+
+            let x = centerStart.x - diffX / this.scaleX;
+            let y = centerStart.y - diffY / this.scaleY;
+
+            this.center.set(x, y);
+        };
+
+        let mouseDown = e => {
+            let { x: mouseX, y: mouseY } = e.data.global;
+            let { x, y } = this.center;
+
+            centerStart = { x, y };
+            mouseStart = { x: mouseX, y: mouseY };
+        };
+
+        let mouseMove = e => {
+            if (mouseStart === null) return;
+
+            move(e);
+        };
+
+        let mouseUp = e => {
+            if (mouseStart === null) return;
+
+            move(e);
+
+            centerStart = null;
+            mouseStart = null;
+        };
+
+        this._background.on('mousedown', mouseDown);
+        this._background.on('mousemove', mouseMove);
+        this._background.on('mouseup', mouseUp);
+        this._background.on('mouseupoutside', mouseUp);
     }
 
     _initializeTicker() {
@@ -175,6 +223,14 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set center(value) {
         this._center.set(value.x, value.y);
+    }
+
+    get scaleX() {
+        return this.width * this.zoom / this.gameWidth;
+    }
+
+    get scaleY() {
+        return this.height * this.zoom / this.gameHeight;
     }
 
     get zoom() {
