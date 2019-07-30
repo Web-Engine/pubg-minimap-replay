@@ -4,6 +4,7 @@ import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
 class Minimap extends PIXI.utils.EventEmitter {
+    // region Constructor
     constructor(data) {
         super();
 
@@ -24,7 +25,9 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._forceRender();
         });
     }
+    // endregion
 
+    // region Initializes
     _initializeOptions() {
 
     }
@@ -213,47 +216,9 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._update(this.currentTime);
         });
     }
+    // endregion
 
-    _update(elapsedTime) {
-        this._components.forEach(component => component.update(elapsedTime));
-        this._uis.forEach(ui => ui.update(elapsedTime));
-    }
-
-    _forceRender() {
-        this._update(this.currentTime);
-        this._app.render();
-    }
-
-    // on zoom change
-    // on width change
-    // on height change
-    // on center change
-    _invalidate() {
-        this._background.width = this.width * this.zoom;
-        this._background.height = this.height * this.zoom;
-
-        let x = (this.center.x / this.gameWidth * this.zoom - 0.5) * this.width;
-        let y = (this.center.y / this.gameWidth * this.zoom - 0.5) * this.height;
-
-        this._componentLayer.position.set(-x, -y);
-
-        if (!this.isPlaying) {
-            this._forceRender();
-        }
-    }
-
-    mount(parent) {
-        parent.appendChild(this._app.view);
-    }
-
-    start() {
-        this.isPlaying = true;
-    }
-
-    stop() {
-        this.isPlaying = false;
-    }
-
+    // region Properties
     get isPlaying() {
         return this._isPlaying;
     }
@@ -369,6 +334,53 @@ class Minimap extends PIXI.utils.EventEmitter {
     get canvas() {
         return this._app.view;
     }
+    // endregion
+
+    // region Private methods
+    _update(elapsedTime) {
+        this._components.forEach(component => component.update(elapsedTime));
+        this._uis.forEach(ui => ui.update(elapsedTime));
+    }
+
+    _forceRender() {
+        this._update(this.currentTime);
+        this._app.render();
+    }
+
+    // on zoom change
+    // on width change
+    // on height change
+    // on center change
+    _invalidate() {
+        this._background.width = this.width * this.zoom;
+        this._background.height = this.height * this.zoom;
+
+        let x = (this.center.x / this.gameWidth * this.zoom - 0.5) * this.width;
+        let y = (this.center.y / this.gameWidth * this.zoom - 0.5) * this.height;
+
+        this._componentLayer.position.set(-x, -y);
+
+        if (!this.isPlaying) {
+            this._forceRender();
+        }
+    }
+
+    // endregion
+
+    // region Public methods
+    mount(parent) {
+        parent.appendChild(this._app.view);
+    }
+
+    start() {
+        this.isPlaying = true;
+    }
+
+    stop() {
+        this.isPlaying = false;
+    }
+
+    // endregion
 }
 
 export { Minimap };
