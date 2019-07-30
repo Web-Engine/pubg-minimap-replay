@@ -31,6 +31,7 @@ class ShapeComponent extends Component {
 
         if (!after || !after.transition || before.type !== after.type) {
             this._shape.draw(before, before, 1, this.scaleX, this.scaleY);
+            this._shape.position.set(-this._shape.width / 2, -this._shape.height / 2);
             return;
         }
 
