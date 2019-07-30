@@ -60,32 +60,43 @@
     var play = document.querySelector('#play');
     var pause = document.querySelector('#pause');
 
-    var replayer = null;
+    var replayer = new Replay.Minimap({
+        size: 800,
+    });
+
+    replayer.on('currentTimeChange', function () {
+        currentTime.value = replayer.currentTime;
+    });
+    replayer.mount(replay);
 
     function onDataLoad(data) {
-        window.data = data;
-
-        replayer = new Replay.Minimap(data, {
-            size: 800,
-        });
+        replayer.load(data);
 
         currentTime.max = replayer.data.meta.duration;
-
-        replayer.on('currentTimeChange', function () {
-            currentTime.value = replayer.currentTime;
-        });
-
-        window.replayer = replayer;
-        replayer.mount(replay);
     }
 
     file.addEventListener('change', function () {
+        if (!file.files.length) return;
+
         var reader = new FileReader();
 
         reader.onload = function(e) {
-            var data = JSON.parse(e.target.result);
+            var data;
 
-            onDataLoad(data);
+            try {
+                data = JSON.parse(e.target.result);
+            }
+            catch (e) {
+                alert('Replay file should be application/json file');
+                return;
+            }
+
+            try {
+                onDataLoad(data);
+            }
+            catch (e) {
+                alert(e);
+            }
         };
 
         reader.readAsText(file.files[0]);

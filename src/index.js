@@ -13,32 +13,23 @@ import ObservablePoint from './observable/point';
 import PlayerAttack from './components/player-attack';
 
 class Minimap extends utils.EventEmitter {
-    constructor(data, options = {}) {
+    constructor(options = {}) {
         super();
 
-        this._initializeData(data);
         this._initializeOptions(options);
+
         this._initializeProperties();
         this._initializePIXI();
-        this._initializeTextures();
 
-        this.on('textureLoad', () => {
-            this._initializeComponents();
-            this._initializeUI();
-            this._initializeEvents();
-            this._initializeTimer();
-
-            this.emit('load');
-        });
+        if (this.options.data) {
+            this.load(this.options.data);
+        }
     }
 
     // region Initialize
-    _initializeData(data) {
-        this.data = normalizeData(data);
-    }
-
     _initializeOptions(options) {
         let {
+            data = null,
             size = 800,
             useHighBackground = true,
             showTimeUI = false,
@@ -79,6 +70,7 @@ class Minimap extends utils.EventEmitter {
         }
 
         this.options = {
+            data,
             size,
             useHighBackground,
             showTimeUI,
@@ -396,7 +388,7 @@ class Minimap extends utils.EventEmitter {
     _initializeMouseWheel() {
         let canvas = this.app.view;
 
-        canvas.addEventListener('wheel', e => {
+        this._onMouseWheel = e => {
             e.preventDefault();
 
             let renderer = this.app.renderer;
@@ -416,7 +408,9 @@ class Minimap extends utils.EventEmitter {
 
             this.zoom = newZoom;
             this.center.set(centerX, centerY);
-        });
+        }
+
+        canvas.addEventListener('wheel', this._onMouseWheel);
     }
 
     _initializeTimer() {
@@ -426,8 +420,9 @@ class Minimap extends utils.EventEmitter {
             seeked = true;
         });
 
-        this.app.ticker.add(delta => {
+        this._tick = delta => {
             let nextTime = this.currentTime;
+
             if (this.isPlaying) {
                 nextTime += 1000 * delta / 60 * this.speed;
             }
@@ -454,7 +449,9 @@ class Minimap extends utils.EventEmitter {
             for (let component of this.components) {
                 component.next(nextTime);
             }
-        });
+        };
+
+        this.app.ticker.add(this._tick);
     }
     // endregion
 
@@ -553,6 +550,62 @@ class Minimap extends utils.EventEmitter {
 
     mount(parent) {
         parent.appendChild(this.app.view);
+    }
+
+    load(data, callback) {
+        this.clear();
+
+        this.data = normalizeData(data);
+        this._initializeTextures();
+
+        this.on('textureLoad', () => {
+            this._initializeComponents();
+            this._initializeUI();
+            this._initializeEvents();
+            this._initializeTimer();
+
+            if (typeof callback === 'function') {
+                callback();
+            }
+
+            this.emit('load');
+        });
+    }
+
+    clear() {
+        this._clearObjects();
+        this._clearEvents();
+        this._clearTimer();
+
+        this._initializeProperties();
+    }
+
+    _clearObjects() {
+        let stage = this.app.stage;
+
+        while (stage.children.length) {
+            let child = stage.children[0];
+            stage.removeChild(child);
+
+            child.destroy({
+                children: true,
+            });
+        }
+
+        this.components = [];
+    }
+
+    _clearEvents() {
+        if (!this._onMouseWheel) return;
+
+        this.app.view.removeEventListener('wheel', this._onMouseWheel);
+        this._onMouseWheel = null;
+    }
+
+    _clearTimer() {
+        if (!this._tick) return;
+
+        this.app.ticker.remove(this._tick);
     }
     // endregion
 }

@@ -423,6 +423,10 @@ function normalizeData(logs) {
         });
     }
 
+    if (!Array.isArray(logs)) {
+        throw 'Invalid replay file format: replay file should be json array';
+    }
+
     {
         let i;
         for (i = 0; i < logs.length; i++) {
