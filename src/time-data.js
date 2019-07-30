@@ -47,7 +47,7 @@ class TimeData {
         }
 
         let difftime = this.after.elapsedTime - this.before.elapsedTime;
-        this._ratio = (elapsedTime - this.before.elapsedTime) / difftime;
+        this._ratio = (this.after.elapsedTime - elapsedTime) / difftime;
     }
 }
 
