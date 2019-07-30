@@ -34,14 +34,18 @@ class Component extends Container {
     }
 
     toScaledPoint({ x, y } = {}) {
-        x = this.toScaledValue(x);
-        y = this.toScaledValue(y);
+        x *= this.scaleX;
+        y *= this.scaleY;
 
         return { x, y };
     }
 
-    toScaledValue(value) {
-        return value / this._minimap.gameWidth * this._minimap.width * this._minimap.zoom;
+    get scaleX() {
+        return this._minimap.width * this._minimap.zoom / this._minimap.gameWidth;
+    }
+
+    get scaleY() {
+        return this._minimap.height * this._minimap.zoom / this._minimap.gameWidth;
     }
 }
 

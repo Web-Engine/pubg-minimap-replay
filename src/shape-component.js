@@ -29,23 +29,12 @@ class ShapeComponent extends Component {
 
         this._shape.visible = true;
 
-        if (!after) {
-            this._shape.draw(before, before, 1);
-            return;
-        }
-        if (
-            before.type !== after.type
-        ) {
-            this._shape.draw(before, before, 1);
+        if (!after || !after.transition || before.type !== after.type) {
+            this._shape.draw(before, before, 1, this.scaleX, this.scaleY);
             return;
         }
 
-        if (!after.transition) {
-            this._shape.draw(before, before, 1);
-            return;
-        }
-
-        this._shape.draw(before, after, ratio);
+        this._shape.draw(before, after, ratio, this.scaleX, this.scaleY);
 
         this._shape.position.set(-this._shape.width / 2, -this._shape.height / 2);
     }

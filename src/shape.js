@@ -15,7 +15,7 @@ class Shape extends Container {
         this.addChild(this._ellipse);
     }
 
-    draw(before, after, ratio) {
+    draw(before, after, ratio, scaleX = 1, scaleY = 1) {
         this._ellipse.visible = false;
         this._rectangle.visible = false;
         this._sprite.visible = false;
@@ -23,19 +23,19 @@ class Shape extends Container {
         switch (before.type)
         {
             case 'ellipse':
-                return this._drawEllipse(before, after, ratio);
+                return this._drawEllipse(before, after, ratio, scaleX, scaleY);
 
             case 'rectangle':
-                return this._drawRectangle(before, after, ratio);
+                return this._drawRectangle(before, after, ratio, scaleX, scaleY);
 
             case 'image':
-                return this._drawImage(before, after, ratio);
+                return this._drawImage(before, after, ratio, scaleX, scaleY);
         }
     }
 
-    _drawEllipse(before, after, ratio) {
-        let width = calcValueRatio(before.width, after.width, ratio);
-        let height = calcValueRatio(before.height, after.height, ratio);
+    _drawEllipse(before, after, ratio, scaleX, scaleY) {
+        let width = calcValueRatio(before.width, after.width, ratio) * scaleX;
+        let height = calcValueRatio(before.height, after.height, ratio) * scaleY;
         let lineWidth = calcValueRatio(before.lineWidth, after.lineWidth, ratio);
         let lineAlpha = calcValueRatio(before.lineAlpha, after.lineAlpha, ratio);
         let fillAlpha = calcValueRatio(before.fillAlpha, after.fillAlpha, ratio);
@@ -51,9 +51,9 @@ class Shape extends Container {
         this._ellipse.visible = true;
     }
 
-    _drawRectangle(before, after, ratio) {
-        let width = calcValueRatio(before.width, after.width, ratio);
-        let height = calcValueRatio(before.height, after.height, ratio);
+    _drawRectangle(before, after, ratio, scaleX, scaleY) {
+        let width = calcValueRatio(before.width, after.width, ratio) * scaleX;
+        let height = calcValueRatio(before.height, after.height, ratio) * scaleY;
         let lineWidth = calcValueRatio(before.lineWidth, after.lineWidth, ratio);
         let lineAlpha = calcValueRatio(before.lineAlpha, after.lineAlpha, ratio);
         let fillAlpha = calcValueRatio(before.fillAlpha, after.fillAlpha, ratio);
@@ -70,10 +70,10 @@ class Shape extends Container {
         this._rectangle.visible = true;
     }
 
-    _drawImage(before, after, ratio) {
+    _drawImage(before, after, ratio, scaleX, scaleY) {
         let texture = before.texture;
-        let width = calcValueRatio(before.width, after.width, ratio);
-        let height = calcValueRatio(before.height, after.height, ratio);
+        let width = calcValueRatio(before.width, after.width, ratio) * scaleX;
+        let height = calcValueRatio(before.height, after.height, ratio) * scaleY;
 
         this._sprite.texture = texture;
         this._sprite.width = width;
