@@ -76,6 +76,7 @@
             },
             width: 400000,
             height: 400000,
+            duration: 40000,
         },
 
         players: [
@@ -187,36 +188,33 @@
     var replayer = new Replay.Minimap(data);
 
     replayer.mount(replay);
-    replayer.start();
+
+    currentTime.max = replayer.duration;
+
+    replayer.on('load', function () {
+        replayer.start();
+    });
 
     currentTime.addEventListener('input', function () {
-        if (replayer === null) return;
-
         replayer.currentTime = currentTime.value;
     });
 
     speed.addEventListener('input', function () {
-        if (replayer === null) return;
-
         replayer.speed = speed.value;
     });
 
     play.addEventListener('click', function () {
-        if (replayer === null) return;
-
         pause.style.display = 'block';
         play.style.display = 'none';
 
-        replayer.play();
+        replayer.start();
     });
 
     pause.addEventListener('click', function () {
-        if (replayer === null) return;
-
         play.style.display = 'block';
         pause.style.display = 'none';
 
-        replayer.pause();
+        replayer.stop();
     });
 </script>
 
