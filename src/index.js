@@ -247,17 +247,30 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     start() {
-        this._isPlaying = true;
-        this._app.start();
+        this.isPlaying = true;
     }
 
     stop() {
-        this._isPlaying = false;
-        this._app.stop();
+        this.isPlaying = false;
     }
 
     get isPlaying() {
         return this._isPlaying;
+    }
+
+    set isPlaying(value) {
+        value = Boolean(value);
+
+        this._isPlaying = value;
+
+        if (this._isPlaying) {
+            this._app.start();
+        }
+        else {
+            this._app.stop();
+        }
+
+        this.emit('playStateChange');
     }
 
     get currentTime() {
