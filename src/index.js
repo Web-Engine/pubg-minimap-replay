@@ -211,7 +211,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeTicker() {
         this._app.ticker.add(delta => {
-            this._currentTime += delta * 1000 / 60 * this._speed;
+            this.currentTime += delta * 1000 / 60 * this._speed;
 
             this._update(this.currentTime);
         });
@@ -347,10 +347,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._app.render();
     }
 
-    // on zoom change
-    // on width change
-    // on height change
-    // on center change
+    // On width, height, zoom, center change
     _invalidate() {
         this._background.width = this.width * this.zoom;
         this._background.height = this.height * this.zoom;
