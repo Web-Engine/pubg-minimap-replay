@@ -1,7 +1,7 @@
 import { Container, Text } from 'pixi.js';
 import TimeData from './time-data';
 import Shape from './shape';
-import { calcValueRatio } from './utils'
+import { calcValueRatio } from './utils';
 
 class GameUI extends Container {
     constructor(data) {
@@ -101,7 +101,7 @@ class GameUI extends Container {
         this._text.style.fillAlpha = textAlpha;
         this._text.style.fontSize = textSize;
 
-        this._text.position.set(this.width / 2, this.height / 2);
+        this._text.position.set(this._shape.width / 2, this._shape.height / 2);
     }
 }
 
