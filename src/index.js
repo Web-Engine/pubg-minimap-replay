@@ -21,6 +21,7 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._initializeUI();
             this._initializeEvents();
             this._initializeTicker();
+            this._forceRender();
         });
     }
 
@@ -33,7 +34,7 @@ class Minimap extends PIXI.utils.EventEmitter {
             width: this._data.canvas.width,
             height: this._data.canvas.height,
             antialias: true,
-            autoStart: true,
+            autoStart: false,
         });
     }
 
@@ -41,8 +42,9 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._currentTime = 0;
         this._zoom = 1;
         this._speed = 10;
-        this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
+        this._isPlaying = false;
 
+        this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
         this._center.on('change', () => {
             let minX = this.gameWidth / this.zoom / 2;
             let maxX = this.gameWidth - minX;
@@ -118,11 +120,13 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._uiLayer = new PIXI.Container();
         this._app.stage.addChild(this._uiLayer);
 
+        this._uis = [];
+
         for (let data of this._data.ui) {
             let ui = new GameUI(data);
             this._uiLayer.addChild(ui);
 
-            this._components.push(ui);
+            this._uis.push(ui);
         }
     }
 
@@ -206,8 +210,18 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._app.ticker.add(delta => {
             this._currentTime += delta * 1000 / 60 * this._speed;
 
-            this._components.forEach(component => component.update(this.currentTime));
+            this._update(this.currentTime);
         });
+    }
+
+    _update(elapsedTime) {
+        this._components.forEach(component => component.update(elapsedTime));
+        this._uis.forEach(ui => ui.update(elapsedTime));
+    }
+
+    _forceRender() {
+        this._update(this.currentTime);
+        this._app.render();
     }
 
     // on zoom change
@@ -222,6 +236,10 @@ class Minimap extends PIXI.utils.EventEmitter {
         let y = (this.center.y / this.gameWidth * this.zoom - 0.5) * this.height;
 
         this._componentLayer.position.set(-x, -y);
+
+        if (!this.isPlaying) {
+            this._forceRender();
+        }
     }
 
     mount(parent) {
@@ -229,11 +247,17 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     start() {
+        this._isPlaying = true;
         this._app.start();
     }
 
     stop() {
+        this._isPlaying = false;
         this._app.stop();
+    }
+
+    get isPlaying() {
+        return this._isPlaying;
     }
 
     get currentTime() {
@@ -245,6 +269,10 @@ class Minimap extends PIXI.utils.EventEmitter {
         if (isNaN(value)) return;
 
         this._currentTime = value;
+
+        if (!this.isPlaying) {
+            this._forceRender();
+        }
 
         this.emit('currentTimeChange');
     }
