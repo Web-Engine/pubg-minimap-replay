@@ -1,8 +1,8 @@
 import ShapeComponent from './shape-component';
 
 class GameObject extends ShapeComponent {
-    constructor(data) {
-        super(data.locations, data.shapes);
+    constructor(minimap, locations, shapes) {
+        super(minimap, locations, shapes);
     }
 }
 

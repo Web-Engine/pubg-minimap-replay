@@ -1,11 +1,12 @@
 import { Container } from 'pixi.js';
-import { calcValueRatio } from './utils';
+import { calcPointRatio } from './utils';
 import TimeData from './time-data';
 
 class Component extends Container {
-    constructor(locations) {
+    constructor(minimap, locations) {
         super();
 
+        this._minimap = minimap;
         this._locations = new TimeData(locations);
     }
 
@@ -25,13 +26,21 @@ class Component extends Container {
             return;
         }
 
-        let { x: beforeX, y: beforeY } = before;
-        let { x: afterX, y: afterY } = after;
-
-        let x = calcValueRatio(beforeX, afterX, ratio);
-        let y = calcValueRatio(beforeY, afterY, ratio);
+        let location = calcPointRatio(before, after, ratio);
+        let { x, y } = this.toScaledPoint(location);
 
         this.position.set(x, y);
+    }
+
+    toScaledPoint({ x, y } = {}) {
+        x = this.toScaledValue(x);
+        y = this.toScaledValue(y);
+
+        return { x, y };
+    }
+
+    toScaledValue(value) {
+        return value / this._minimap.gameWidth * this._minimap.width * this._minimap.zoom;
     }
 }
 

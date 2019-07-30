@@ -3,8 +3,8 @@ import TimeData from './time-data';
 import Shape from './shape';
 
 class ShapeComponent extends Component {
-    constructor(locations, shapes) {
-        super(locations);
+    constructor(minimap, locations, shapes) {
+        super(minimap, locations);
 
         this._shapes = new TimeData(shapes);
 

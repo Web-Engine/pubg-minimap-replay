@@ -83,7 +83,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializePlayers() {
         for (let data of this._data.players) {
-            let player = new GamePlayer(data);
+            let player = new GamePlayer(this, data);
             this._componentLayer.addChild(player);
 
             this._components.push(player);

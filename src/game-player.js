@@ -1,8 +1,8 @@
 import GameObject from './game-object'
 
 class GamePlayer extends GameObject {
-    constructor(data) {
-        super(data);
+    constructor(minimap, data) {
+        super(minimap, data.locations, data.shapes);
     }
 }
 
