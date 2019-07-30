@@ -13,7 +13,6 @@ class Player extends Component {
         this.accountId = data.accountId;
 
         this.registerTimeData('location', data.locations);
-        this.registerTimeData('health', data.healths);
 
         let circle = new Graphics();
         this.addChild(circle);
@@ -24,8 +23,6 @@ class Player extends Component {
         text.anchor.set(0.5, 0.5);
 
         this.addChild(text);
-
-        this.health = 100;
 
         this.interactive = true;
         this.buttonMode = true;
@@ -59,7 +56,6 @@ class Player extends Component {
         this._state = enums.PlayerState.ALIVE;
 
         this._nextLocationIndex = 0;
-        this._nextHealthIndex = 0;
 
         this.redrawCircle();
     }
@@ -70,18 +66,6 @@ class Player extends Component {
 
     set state(value) {
         if (this._state === value) return;
-
-        this.redrawCircle();
-    }
-
-    get health() {
-        return this._health;
-    }
-
-    set health(value) {
-        if (this._health === value) return;
-
-        this._health = value;
 
         this.redrawCircle();
     }
@@ -126,7 +110,6 @@ class Player extends Component {
 
     update() {
         this.updateLocation();
-        this.updateHealth();
     }
 
     updateLocation() {
@@ -149,22 +132,6 @@ class Player extends Component {
         let { x, y } = this.toScaledPoint(location);
 
         this.position.set(x, y);
-    }
-
-    updateHealth() {
-        let { before } = this.current('health');
-
-        if (!before) {
-            this.visible = false;
-            return;
-        }
-
-        this.visible = true;
-
-        this._health = before.health;
-        this._state = before.state;
-
-        this.redrawCircle();
     }
 }
 

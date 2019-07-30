@@ -358,7 +358,10 @@ class Minimap extends utils.EventEmitter {
                 this.pause();
             }
 
-            this._currentTime = nextTime;
+            if (this._currentTime !== nextTime) {
+                this._currentTime = nextTime;
+                this.emit('currentTimeChange');
+            }
 
             if (seeked) {
                 for (let component of this.components) {

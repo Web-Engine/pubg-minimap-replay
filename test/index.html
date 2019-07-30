@@ -6,9 +6,15 @@
 
     <style>
         body { margin: 0; }
+        #current-time {
+            display: block;
+            width: 400px;
+        }
     </style>
 </head>
 <body>
+
+<input id="current-time" type="range" min="0" max="100" value="0">
 
 <script src="../dist/bundle.js"></script>
 
@@ -16,10 +22,30 @@
     function onDataLoad(data) {
         window.data = data;
 
-        window.replayer = new Replay.Minimap(data, {
+        var replayer = new Replay.Minimap(data, {
             size: 800,
         });
 
+        var currentTime = document.querySelector('#current-time');
+        currentTime.max = replayer.data.meta.duration;
+
+        replayer.on('currentTimeChange', () => {
+            currentTime.value = replayer.currentTime;
+        });
+
+        currentTime.addEventListener('mousedown', () => {
+            replayer.pause();
+        });
+
+        currentTime.addEventListener('input', () => {
+            replayer.currentTime = currentTime.value;
+        });
+
+        currentTime.addEventListener('mouseup', () => {
+            replayer.play();
+        });
+
+        window.replayer = replayer;
         document.body.appendChild(replayer.app.view);
     }
 </script>

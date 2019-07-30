@@ -407,9 +407,16 @@ function normalizeData(logs) {
     }
 
     function addAlivePlayers(numAlivePlayers, elapsedTime) {
+        if (data.alivePlayers.length && data.alivePlayers[data.alivePlayers.length - 1].text === String(numAlivePlayers)) {
+            return;
+        }
+
         data.alivePlayers.push({
-            numAlivePlayers,
-            elapsedTime,
+            text: String(numAlivePlayers),
+            textColor: 0xffffff,
+            textAlpha: 1,
+            textSize: 30,
+            elapsedTime: elapsedTime,
         });
     }
 
@@ -420,6 +427,41 @@ function normalizeData(logs) {
             attacker: { location: normalizeLocation(attacker.location) },
             victim: { location: normalizeLocation(victim.location) },
             elapsedTime,
+        });
+    }
+
+    function getPlayerData(accountId) {
+        if (accountId in data.newPlayers) {
+            return data.newPlayers[accountId];
+        }
+
+        data.newPlayers[accountId] = {
+            locations: [],
+            shapes: [
+                {
+                    type: 'circle',
+                    radius: 10,
+                    fillColor: 0xFFFFFF,
+                    fillAlpha: 1,
+                    lineColor: 0xFF0000,
+                    lineAlpha: 1,
+                    elapsedTime: 0,
+                },
+            ],
+        };
+
+        return data.newPlayers[accountId];
+    }
+
+    function addPlayerLocationData(character, elapsedTime) {
+        let player = getPlayerData(character.accountId);
+
+        let { x, y } = character.location;
+
+        player.locations.push({
+            x: x,
+            y: y,
+            elapsedTime: elapsedTime,
         });
     }
 
@@ -454,10 +496,15 @@ function normalizeData(logs) {
         carePackages: [],
         alivePlayers: [],
         playerAttacks: [],
+        newPlayers: {},
     };
 
     for (let character of matchStart.characters) {
         addPlayerLocation(character, 0);
+    }
+
+    for (let newcharacter of matchStart.characters) {
+        addPlayerLocationData(newcharacter, 0);
     }
 
     let startTime = getTime(matchStart._D);
@@ -473,9 +520,11 @@ function normalizeData(logs) {
         case 'LogArmorDestroy': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime)
             }
 
             addPlayerLocation(log.victim, elapsedTime);
+            addPlayerLocationData(log.victim, elapsedTime);
             break;
         }
 
@@ -531,52 +580,62 @@ function normalizeData(logs) {
 
         case 'LogHeal': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             addPlayerHealth(log.character, log.character.health, enums.PlayerState.ALIVE, elapsedTime);
             break;
         }
 
         case 'LogItemAttach': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemDetach': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemDrop': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemEquip': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemPickup': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemPickupFromCarepackage': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemPickupFromLootbox': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemUnequip': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogItemUse': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
@@ -604,17 +663,20 @@ function normalizeData(logs) {
 
         case 'LogObjectDestroy': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogParachuteLanding': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogPlayerAttack': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime);
             }
 
             break;
@@ -627,13 +689,16 @@ function normalizeData(logs) {
         case 'LogPlayerKill': {
             if (isPlayer(log.killer)) {
                 addPlayerLocation(log.killer, elapsedTime);
+                addPlayerLocationData(log.killer, elapsedTime);
             }
 
             addPlayerLocation(log.victim, elapsedTime);
+            addPlayerLocationData(log.victim, elapsedTime);
             addPlayerHealth(log.victim, 0, enums.PlayerState.DEAD, elapsedTime);
 
             if (isPlayer(log.assistant)) {
                 addPlayerLocation(log.assistant, elapsedTime);
+                addPlayerLocationData(log.assistant, elapsedTime);
             }
             break;
         }
@@ -649,22 +714,27 @@ function normalizeData(logs) {
         case 'LogPlayerMakeGroggy': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime);
             }
 
             addPlayerLocation(log.victim, elapsedTime);
+            addPlayerLocationData(log.victim, elapsedTime);
             addPlayerHealth(log.victim, 0, enums.PlayerState.GROGGY, elapsedTime);
             break;
         }
 
         case 'LogPlayerPosition': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             addAlivePlayers(log.numAlivePlayers, elapsedTime);
             break;
         }
 
         case 'LogPlayerRevive': {
             addPlayerLocation(log.reviver, elapsedTime);
+            addPlayerLocationData(log.reviver, elapsedTime);
             addPlayerLocation(log.victim, elapsedTime);
+            addPlayerLocationData(log.victim, elapsedTime);
 
             addPlayerHealth(log.victim, log.victim.health, enums.PlayerState.ALIVE, elapsedTime);
             break;
@@ -673,9 +743,11 @@ function normalizeData(logs) {
         case 'LogPlayerTakeDamage': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime);
             }
 
             addPlayerLocation(log.victim, elapsedTime);
+            addPlayerLocationData(log.victim, elapsedTime);
             addPlayerHealth(log.victim, log.victim.health - log.damage, null, elapsedTime);
             addPlayerAttack(log.attacker, log.victim, elapsedTime);
             break;
@@ -684,28 +756,33 @@ function normalizeData(logs) {
         case 'LogRedZoneEnded': {
             for (let driver of log.drivers) {
                 addPlayerLocation(driver, elapsedTime);
+                addPlayerLocationData(driver, elapsedTime);
             }
             break;
         }
 
         case 'LogSwimEnd': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogSwimStart': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogVaultStart': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogVehicleDestroy': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime);
             }
 
             break;
@@ -713,22 +790,26 @@ function normalizeData(logs) {
 
         case 'LogVehicleLeave': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogVehicleRide': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogWeaponFireCount': {
             addPlayerLocation(log.character, elapsedTime);
+            addPlayerLocationData(log.character, elapsedTime);
             break;
         }
 
         case 'LogWheelDestroy': {
             if (isPlayer(log.attacker)) {
                 addPlayerLocation(log.attacker, elapsedTime);
+                addPlayerLocationData(log.attacker, elapsedTime);
             }
 
             break;
