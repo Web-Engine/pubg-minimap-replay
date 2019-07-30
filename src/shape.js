@@ -46,7 +46,7 @@ class Shape extends Container {
 
         this._ellipse.lineStyle(lineWidth, lineColor, lineAlpha);
         this._ellipse.beginFill(fillColor, fillAlpha);
-        this._ellipse.drawEllipse(width / 2, height / 2, width, height);
+        this._ellipse.drawEllipse(width / 2, height / 2, width / 2, height / 2);
         this._ellipse.endFill();
         this._ellipse.visible = true;
     }
