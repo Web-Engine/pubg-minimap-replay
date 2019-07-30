@@ -78,6 +78,8 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeBackground() {
         this._background = new PIXI.Sprite(this._data.game.background.texture);
+        this._background.width = this.width * this.zoom;
+        this._background.height = this.height * this.zoom;
         this._componentLayer.addChild(this._background);
     }
 
