@@ -41,7 +41,11 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._currentTime = 0;
         this._zoom = 1;
         this._speed = 10;
-        this._center = new ObservablePoint();
+        this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
+
+        this._center.on('change', () => {
+            this._invalidate();
+        });
     }
 
     _loadAssets(data) {
@@ -119,6 +123,20 @@ class Minimap extends PIXI.utils.EventEmitter {
         });
     }
 
+    // on zoom change
+    // on width change
+    // on height change
+    // on center change
+    _invalidate() {
+        this._background.width = this.width * this.zoom;
+        this._background.height = this.height * this.zoom;
+
+        let x = (this.center.x / this.gameWidth * this.zoom - 0.5) * this.width;
+        let y = (this.center.y / this.gameWidth * this.zoom - 0.5) * this.height;
+
+        this._componentLayer.position.set(-x, -y);
+    }
+
     mount(parent) {
         parent.appendChild(this._app.view);
     }
@@ -137,6 +155,8 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set currentTime(value) {
         this._currentTime = value;
+
+        this.emit('currentTimeChange');
     }
 
     get speed() {
@@ -145,6 +165,16 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set speed(value) {
         this._speed = value;
+
+        this.emit('speedChange');
+    }
+
+    get center() {
+        return this._center;
+    }
+
+    set center(value) {
+        this._center.set(value.x, value.y);
     }
 
     get zoom() {
@@ -153,6 +183,9 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set zoom(value) {
         this._zoom = value;
+
+        this._invalidate();
+        this.emit('zoomChange');
     }
 
     get gameWidth() {
@@ -168,7 +201,10 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     set width(value) {
-        return this._app.renderer.resize(value, this._app.renderer.height);
+        this._app.renderer.resize(value, this._app.renderer.height);
+
+        this._invalidate();
+        this.emit('widthChange');
     }
 
     get height() {
@@ -177,6 +213,9 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set height(value) {
         this._app.renderer.resize(this._app.renderer.width, value);
+
+        this._invalidate();
+        this.emit('heightChange');
     }
 
     get canvas() {
