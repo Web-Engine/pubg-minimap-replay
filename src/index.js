@@ -277,6 +277,10 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     set zoom(value) {
+        if (value < 1) {
+            value = 1;
+        }
+
         this._zoom = value;
 
         this._center.set(this._center.x, this._center.y);
