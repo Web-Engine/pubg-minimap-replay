@@ -11,19 +11,19 @@ class Shape extends Container {
         this._rectangle = new Graphics();
         this.addChild(this._rectangle);
 
-        this._circle = new Graphics();
-        this.addChild(this._circle);
+        this._ellipse = new Graphics();
+        this.addChild(this._ellipse);
     }
 
     draw(before, after, ratio) {
-        this._circle.visible = false;
+        this._ellipse.visible = false;
         this._rectangle.visible = false;
         this._sprite.visible = false;
 
         switch (before.type)
         {
-            case 'circle':
-                return this._drawCircle(before, after, ratio);
+            case 'ellipse':
+                return this._drawEllipse(before, after, ratio);
 
             case 'rectangle':
                 return this._drawRectangle(before, after, ratio);
@@ -33,21 +33,22 @@ class Shape extends Container {
         }
     }
 
-    _drawCircle(before, after, ratio) {
-        let radius = calcValueRatio(before.radius, after.radius, ratio);
+    _drawEllipse(before, after, ratio) {
+        let width = calcValueRatio(before.width, after.width, ratio);
+        let height = calcValueRatio(before.height, after.height, ratio);
         let lineWidth = calcValueRatio(before.lineWidth, after.lineWidth, ratio);
         let lineAlpha = calcValueRatio(before.lineAlpha, after.lineAlpha, ratio);
         let fillAlpha = calcValueRatio(before.fillAlpha, after.fillAlpha, ratio);
         let lineColor = before.lineColor;
         let fillColor = before.fillColor;
 
-        this._circle.clear();
+        this._ellipse.clear();
 
-        this._circle.lineStyle(lineWidth, lineColor, lineAlpha);
-        this._circle.beginFill(fillColor, fillAlpha);
-        this._circle.drawCircle(radius, radius, radius);
-        this._circle.endFill();
-        this._circle.visible = true;
+        this._ellipse.lineStyle(lineWidth, lineColor, lineAlpha);
+        this._ellipse.beginFill(fillColor, fillAlpha);
+        this._ellipse.drawCircle(width / 2, height / 2, width, height);
+        this._ellipse.endFill();
+        this._ellipse.visible = true;
     }
 
     _drawRectangle(before, after, ratio) {
