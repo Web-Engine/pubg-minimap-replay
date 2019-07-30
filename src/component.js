@@ -13,6 +13,18 @@ class Component extends Container {
         this._locations.seek(elapsedTime);
 
         let { before, after, ratio } = this._locations;
+
+        if (!before) {
+            this.x = -Infinity;
+            this.y = -Infinity;
+            return;
+        }
+
+        if (!after) {
+            this.position.set(before.x, before.y);
+            return;
+        }
+
         let { x: beforeX, y: beforeY } = before;
         let { x: afterX, y: afterY } = after;
 
