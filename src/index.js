@@ -40,6 +40,7 @@ class Minimap extends PIXI.utils.EventEmitter {
     _initializeProperties() {
         this._currentTime = 0;
         this._zoom = 1;
+        this._speed = 10;
         this._center = new ObservablePoint();
     }
 
@@ -110,7 +111,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeTicker() {
         this._app.ticker.add(delta => {
-            this._currentTime += delta;
+            this._currentTime += delta * 1000 / 60 * this._speed;
 
             this._components.forEach(component => component.update(this.currentTime));
         });
@@ -137,11 +138,11 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     get speed() {
-        return this._app.speed;
+        return this._speed;
     }
 
     set speed(value) {
-        this._app.speed = value;
+        this._speed = value;
     }
 
     get zoom() {
