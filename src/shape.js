@@ -1,5 +1,5 @@
 import { Container, Graphics, Sprite } from 'pixi.js';
-import { calcValueRatio } from './utils'
+import { calcValueRatio } from './utils';
 
 class Shape extends Container {
     constructor() {
@@ -20,16 +20,15 @@ class Shape extends Container {
         this._rectangle.visible = false;
         this._sprite.visible = false;
 
-        switch (before.type)
-        {
-            case 'ellipse':
-                return this._drawEllipse(before, after, ratio, scaleX, scaleY);
+        switch (before.type) {
+        case 'ellipse':
+            return this._drawEllipse(before, after, ratio, scaleX, scaleY);
 
-            case 'rectangle':
-                return this._drawRectangle(before, after, ratio, scaleX, scaleY);
+        case 'rectangle':
+            return this._drawRectangle(before, after, ratio, scaleX, scaleY);
 
-            case 'image':
-                return this._drawImage(before, after, ratio, scaleX, scaleY);
+        case 'image':
+            return this._drawImage(before, after, ratio, scaleX, scaleY);
         }
     }
 
