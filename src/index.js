@@ -44,6 +44,21 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
 
         this._center.on('change', () => {
+            let minX = this.gameWidth / this.zoom / 2;
+            let maxX = this.gameWidth - minX;
+            let minY = this.gameHeight / this.zoom / 2;
+            let maxY = this.gameHeight - minY;
+
+            let { x, y } = this._center;
+
+            x = Math.min(Math.max(x, minX), maxX);
+            y = Math.min(Math.max(y, minY), maxY);
+
+            if (this._center.x !== x || this._center.y !== y) {
+                this._center.set(x, y);
+                return;
+            }
+
             this._invalidate();
         });
     }
@@ -240,6 +255,7 @@ class Minimap extends PIXI.utils.EventEmitter {
     set zoom(value) {
         this._zoom = value;
 
+        this._center.set(this._center.x, this._center.y);
         this._invalidate();
         this.emit('zoomChange');
     }
