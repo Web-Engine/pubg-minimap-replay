@@ -49,10 +49,14 @@ class Minimap extends PIXI.utils.EventEmitter {
 
         this._app.loader.load((loader, resources) => {
             function setTexture(data) {
-                data.texture = resources[data.asset].texture;
+                data.texture = resources[data.image].texture;
             }
 
             setTexture(data.game.background);
+
+            data.players.forEach(player => {
+                player.shapes.filter(shape => shape.type === 'image').forEach(shape => setTexture(shape));
+            });
 
             this.emit('assetsLoaded');
         });
