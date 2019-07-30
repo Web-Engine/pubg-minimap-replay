@@ -20,7 +20,7 @@ class Component extends Container {
             return;
         }
 
-        if (!after) {
+        if (!after || !after.transition) {
             this.position.set(before.x, before.y);
             return;
         }
