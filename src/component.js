@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js';
-import { calcValueRatio } from 'utils';
-import TimeData from 'time-data';
+import { calcValueRatio } from './utils';
+import TimeData from './time-data';
 
 class Component extends Container {
     constructor(locations) {

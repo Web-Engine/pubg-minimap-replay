@@ -1,6 +1,7 @@
-import { Container } from 'pixi.js';
-import { calcValueRatio } from 'utils';
-import TimeData from 'time-data';
+import { Container, Sprite, Graphics } from 'pixi.js';
+import { calcValueRatio } from './utils';
+import Component from './component';
+import TimeData from './time-data';
 
 class ShapeComponent extends Component {
     constructor(locations, shapes) {
