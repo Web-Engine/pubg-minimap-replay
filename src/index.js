@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import GamePlayer from './game-player';
 import GameUI from './game-ui';
+import ObservablePoint from './observable/point';
 
 class Minimap extends PIXI.utils.EventEmitter {
     constructor(data) {
@@ -38,6 +39,8 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeProperties() {
         this._currentTime = 0;
+        this._zoom = 1;
+        this._center = new ObservablePoint();
     }
 
     _loadAssets(data) {
@@ -74,7 +77,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeBackground() {
         this._background = new PIXI.Sprite(this._data.game.background.texture);
-        this._app.stage.addChild(this._background);
+        this._componentLayer.addChild(this._background);
     }
 
     _initializePlayers() {
@@ -139,6 +142,42 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     set speed(value) {
         this._app.speed = value;
+    }
+
+    get zoom() {
+        return this._zoom;
+    }
+
+    set zoom(value) {
+        this._zoom = value;
+    }
+
+    get gameWidth() {
+        return this._data.game.width;
+    }
+
+    get gameHeight() {
+        return this._data.game.height;
+    }
+
+    get width() {
+        return this._app.renderer.width;
+    }
+
+    set width(value) {
+        return this._app.renderer.resize(value, this._app.renderer.height);
+    }
+
+    get height() {
+        return this._app.renderer.height;
+    }
+
+    set height(value) {
+        this._app.renderer.resize(this._app.renderer.width, value);
+    }
+
+    get canvas() {
+        return this._app.view;
     }
 }
 
