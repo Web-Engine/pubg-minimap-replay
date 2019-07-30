@@ -128,7 +128,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
     _initializeEvents() {
         this._initializePanDrag();
-
+        this._initializeWheelZoom();
     }
 
     _initializePanDrag() {
@@ -176,6 +176,30 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._background.on('mousemove', mouseMove);
         this._background.on('mouseup', mouseUp);
         this._background.on('mouseupoutside', mouseUp);
+    }
+
+    _initializeWheelZoom() {
+        this.canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+
+            let { layerX, layerY } = e;
+
+            layerX -= this.width / 2;
+            layerY -= this.height / 2;
+
+            layerX *= this.gameWidth / this.width;
+            layerY *= this.gameHeight / this.height;
+
+            let mouseX = this.center.x + layerX / this.zoom;
+            let mouseY = this.center.y + layerY / this.zoom;
+
+            this.zoom += e.deltaY * -0.005;
+
+            let centerX = mouseX - layerX / this.zoom;
+            let centerY = mouseY - layerY / this.zoom;
+
+            this.center.set(centerX, centerY);
+        });
     }
 
     _initializeTicker() {
