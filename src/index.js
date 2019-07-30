@@ -241,9 +241,16 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     set currentTime(value) {
+        value = Number(value);
+        if (isNaN(value)) return;
+
         this._currentTime = value;
 
         this.emit('currentTimeChange');
+    }
+
+    get duration() {
+        return this._data.game.duration;
     }
 
     get speed() {
