@@ -22,7 +22,8 @@ class Component extends Container {
         }
 
         if (!after || !after.transition) {
-            this.position.set(before.x, before.y);
+            let { x, y } = this.toScaledPoint(before);
+            this.position.set(x, y);
             return;
         }
 
