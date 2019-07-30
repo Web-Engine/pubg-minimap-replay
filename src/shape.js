@@ -45,7 +45,7 @@ class Shape extends Container {
 
         this._circle.lineStyle(lineWidth, lineColor, lineAlpha);
         this._circle.beginFill(fillColor, fillAlpha);
-        this._circle.drawCircle(0, 0, radius);
+        this._circle.drawCircle(radius, radius, radius);
         this._circle.endFill();
         this._circle.visible = true;
     }
@@ -63,7 +63,7 @@ class Shape extends Container {
 
         this._rectangle.lineStyle(lineWidth, lineColor, lineAlpha);
         this._rectangle.beginFill(fillColor, fillAlpha);
-        this._rectangle.drawRect(width / -2, height / -2, width, height);
+        this._rectangle.drawRect(0, 0, width, height);
         this._rectangle.endFill();
 
         this._rectangle.visible = true;

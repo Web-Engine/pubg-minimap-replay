@@ -23,11 +23,11 @@ class ShapeComponent extends Component {
         let { before, after, ratio } = this._shapes;
 
         if (!before) {
-            this.visible = false;
+            this._shape.visible = false;
             return;
         }
 
-        this.visible = true;
+        this._shape.visible = true;
 
         if (!after) {
             this._shape.draw(before, before, 1);
@@ -46,6 +46,8 @@ class ShapeComponent extends Component {
         }
 
         this._shape.draw(before, after, ratio);
+
+        this._shape.position.set(-this._shape.width / 2, -this._shape.height / 2);
     }
 }
 
