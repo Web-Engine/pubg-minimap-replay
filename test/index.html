@@ -60,47 +60,136 @@
     var play = document.querySelector('#play');
     var pause = document.querySelector('#pause');
 
-    var replayer = new Replay.Minimap({
-        size: 800,
-    });
+    var data = {
+        assets: {
+            background: 'assets/maps/Sanhok_Main_Low_Res.png',
+        },
 
-    replayer.on('currentTimeChange', function () {
-        currentTime.value = replayer.currentTime;
-    });
+        canvas: {
+            width: 800,
+            height: 800,
+        },
+
+        game: {
+            background: {
+                asset: 'background',
+            },
+            width: 400000,
+            height: 400000,
+        },
+
+        players: [
+            {
+                locations: [
+                    {
+                        x: 0,
+                        y: 0,
+                        elapsedTime: 0,
+                    },
+                    {
+                        x: 0,
+                        y: 0,
+                        elapsedTime: 200,
+                    },
+                    {
+                        x: 300,
+                        y: 300,
+                        elapsedTime: 300,
+                    },
+                ],
+                shapes: [
+                    {
+                        type: 'circle',
+                        radius: 10,
+                        fillColor: 0xFFFFFF,
+                        fillAlpha: 1,
+                        lineColor: 0xFF0000,
+                        lineAlpha: 1,
+                        elapsedTime: 0,
+                    },
+                    {
+                        type: 'circle',
+                        radius: 20,
+                        fillColor: 0xFFFFFF,
+                        fillAlpha: 1,
+                        lineColor: 0xFF0000,
+                        lineAlpha: 1,
+                        elapsedTime: 100,
+                        transition: true,
+                    },
+                ],
+            },
+        ],
+
+        objects: [],
+        attacks: [],
+
+        ui: [
+            {
+                positions: [
+                    {
+                        x: 0,
+                        y: 0,
+                        elapsedTime: 0,
+                    },
+                    {
+                        x: 200,
+                        y: 200,
+                        elapsedTime: 100,
+                        transition: true,
+                    },
+                ],
+
+                shapes: [
+                    {
+                        type: 'rectangle',
+                        width: 100,
+                        height: 100,
+                        fillColor: 0x888888,
+                        fillAlpha: 1,
+                        lineColor: 0xFFFFFF,
+                        lineAlpha: 1,
+                        elapsedTime: 0,
+                    },
+                    {
+                        type: 'rectangle',
+                        width: 50,
+                        height: 50,
+                        fillColor: 0x888888,
+                        fillAlpha: 1,
+                        lineColor: 0xFFFFFF,
+                        lineAlpha: 1,
+                        elapsedTime: 200,
+                        transition: true,
+                    },
+                ],
+
+                texts: [
+                    {
+                        text: 'Hi',
+                        textColor: 0xFFFFFF,
+                        textAlpha: 1,
+                        textSize: 30,
+                        elapsedTime: 0,
+                    },
+                ],
+            },
+        ],
+
+        zoom: {
+            min: 1,
+            max: 10,
+            controller: true,
+            wheel: true,
+        },
+
+        pan: true,
+    };
+
+    var replayer = new Replay.Minimap(data);
+
     replayer.mount(replay);
-
-    function onDataLoad(data) {
-        replayer.load(data);
-
-        currentTime.max = replayer.data.meta.duration;
-    }
-
-    file.addEventListener('change', function () {
-        if (!file.files.length) return;
-
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            var data;
-
-            try {
-                data = JSON.parse(e.target.result);
-            }
-            catch (e) {
-                alert('Replay file should be application/json file');
-                return;
-            }
-
-            try {
-                onDataLoad(data);
-            }
-            catch (e) {
-                alert(e);
-            }
-        };
-
-        reader.readAsText(file.files[0]);
-    });
+    replayer.start();
 
     currentTime.addEventListener('input', function () {
         if (replayer === null) return;
