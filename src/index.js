@@ -87,6 +87,10 @@ class Minimap extends PIXI.utils.EventEmitter {
                 character.shapes.filter(shape => shape.type === 'image').forEach(shape => setTexture(shape));
             });
 
+            data.objects.forEach(character => {
+                character.shapes.filter(shape => shape.type === 'image').forEach(shape => setTexture(shape));
+            });
+
             this.emit('assetsLoaded');
         });
     }
