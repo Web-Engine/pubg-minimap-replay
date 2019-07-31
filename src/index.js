@@ -50,6 +50,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._speed = 10;
         this._isPlaying = false;
         this._components = [];
+        this._tooltips = [];
 
         this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
         this._center.on('change', () => {
@@ -127,6 +128,42 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._componentLayer.addChild(object);
 
             this._components.push(object);
+
+            if (!data.tooltips || !data.tooltips.length) continue;
+
+            let tooltip = new TextTooltip(data.tooltips);
+            tooltip.connect(object);
+            tooltip.visible = false;
+
+            this._tooltipLayer.addChild(tooltip);
+            this._tooltips.push(tooltip);
+
+            let fix = false;
+
+            object.interactive = true;
+            object.buttonMode = true;
+
+            object.on('mouseover', () => {
+                if (fix) return;
+
+                tooltip.visible = true;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
+
+            object.on('click', () => {
+                fix = !fix;
+            });
+
+            object.on('mouseout', () => {
+                if (fix) return;
+
+                tooltip.visible = false;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
         }
     }
 
@@ -137,35 +174,35 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             this._components.push(character);
 
-            let tooltip = new TextTooltip('text');
-            tooltip.connect(character);
-            tooltip.visible = false;
-
-            this._tooltipLayer.addChild(tooltip);
-
-            let fix = false;
-
-            character.on('mouseover', () => {
-                if (fix) return;
-
-                tooltip.visible = true;
-
-                if (this.isPlaying) return;
-                this._forceRender();
-            });
-
-            character.on('click', () => {
-                fix = !fix;
-            });
-
-            character.on('mouseout', () => {
-                if (fix) return;
-
-                tooltip.visible = false;
-
-                if (this.isPlaying) return;
-                this._forceRender();
-            });
+            // let tooltip = new TextTooltip('text');
+            // tooltip.connect(character);
+            // tooltip.visible = false;
+            //
+            // this._tooltipLayer.addChild(tooltip);
+            //
+            // let fix = false;
+            //
+            // character.on('mouseover', () => {
+            //     if (fix) return;
+            //
+            //     tooltip.visible = true;
+            //
+            //     if (this.isPlaying) return;
+            //     this._forceRender();
+            // });
+            //
+            // character.on('click', () => {
+            //     fix = !fix;
+            // });
+            //
+            // character.on('mouseout', () => {
+            //     if (fix) return;
+            //
+            //     tooltip.visible = false;
+            //
+            //     if (this.isPlaying) return;
+            //     this._forceRender();
+            // });
         }
     }
 
@@ -397,6 +434,7 @@ class Minimap extends PIXI.utils.EventEmitter {
     // region Private methods
     _update(elapsedTime) {
         this._components.forEach(component => component.update(elapsedTime));
+        this._tooltips.forEach(tooltip => tooltip.update(elapsedTime));
         this._uis.forEach(ui => ui.update(elapsedTime));
     }
 
