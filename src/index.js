@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
-import GamePlayer from './game-player';
+import GameObject from './game-object';
+import GameCharacter from './game-character';
 import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
@@ -82,8 +83,8 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             setTexture(data.game.background);
 
-            data.players.forEach(player => {
-                player.shapes.filter(shape => shape.type === 'image').forEach(shape => setTexture(shape));
+            data.characters.forEach(character => {
+                character.shapes.filter(shape => shape.type === 'image').forEach(shape => setTexture(shape));
             });
 
             this.emit('assetsLoaded');
@@ -96,8 +97,9 @@ class Minimap extends PIXI.utils.EventEmitter {
 
         this._components = [];
         this._initializeBackground();
-        this._initializePlayers();
-        this._initializePlayerAttacks();
+        this._initializeObjects();
+        this._initializeCharacter();
+        this._initializeAttacks();
     }
 
     _initializeBackground() {
@@ -107,16 +109,25 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._componentLayer.addChild(this._background);
     }
 
-    _initializePlayers() {
-        for (let data of this._data.players) {
-            let player = new GamePlayer(this, data);
-            this._componentLayer.addChild(player);
+    _initializeObjects() {
+        for (let data of this._data.objects) {
+            let object = new GameObject(this, data.locations, data.shapes);
+            this._componentLayer.addChild(object);
 
-            this._components.push(player);
+            this._components.push(object);
         }
     }
 
-    _initializePlayerAttacks() {
+    _initializeCharacter() {
+        for (let data of this._data.characters) {
+            let character = new GameCharacter(this, data);
+            this._componentLayer.addChild(character);
+
+            this._components.push(character);
+        }
+    }
+
+    _initializeAttacks() {
     }
 
     _initializeUI() {

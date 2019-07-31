@@ -1,6 +1,6 @@
 import GameObject from './game-object';
 
-class GamePlayer extends GameObject {
+class GameCharacter extends GameObject {
     constructor(minimap, data) {
         super(minimap, data.locations, data.shapes);
 
@@ -9,4 +9,4 @@ class GamePlayer extends GameObject {
     }
 }
 
-export default GamePlayer;
+export default GameCharacter;
