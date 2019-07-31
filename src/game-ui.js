@@ -58,29 +58,6 @@ class GameUI extends Container {
     _drawShape() {
         let { before, after, ratio } = this._shapes;
 
-        if (!before) {
-            this._shape.visible = false;
-            return;
-        }
-
-        this._shape.visible = true;
-
-        if (!after) {
-            this._shape.draw(before, before, 1);
-            return;
-        }
-        if (
-            before.type !== after.type
-        ) {
-            this._shape.draw(before, before, 1);
-            return;
-        }
-
-        if (!after.transition) {
-            this._shape.draw(before, before, 1);
-            return;
-        }
-
         this._shape.draw(before, after, ratio);
     }
 

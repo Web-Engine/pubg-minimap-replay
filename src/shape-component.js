@@ -22,25 +22,12 @@ class ShapeComponent extends Component {
     _draw() {
         let { before, after, ratio } = this._shapes;
 
-        if (!before) {
-            this._shape.visible = false;
-            return;
-        }
-
-        this._shape.visible = true;
-
         let scaleX = this.scaleX;
         let scaleY = this.scaleY;
 
-        if (before.fixSize) {
+        if (before && before.fixSize) {
             scaleX = 1;
             scaleY = 1;
-        }
-
-        if (!after || !after.transition || before.type !== after.type || before.fixSize !== after.fixSize) {
-            this._shape.draw(before, before, 1, scaleX, scaleY);
-            this._shape.position.set(-this._shape.width / 2, -this._shape.height / 2);
-            return;
         }
 
         this._shape.draw(before, after, ratio, scaleX, scaleY);

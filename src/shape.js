@@ -16,6 +16,18 @@ class Shape extends Container {
     }
 
     draw(before, after, ratio, scaleX = 1, scaleY = 1) {
+        if (!before) {
+            this.visible = false;
+            return;
+        }
+
+        this.visible = true;
+
+        if (!after || !after.transition || before.type !== after.type) {
+            after = before;
+            ratio = 1;
+        }
+
         this._ellipse.visible = false;
         this._rectangle.visible = false;
         this._sprite.visible = false;
