@@ -1,7 +1,7 @@
 import { Container, Text } from 'pixi.js';
 import TimeData from './time-data';
 import Shape from './shape';
-import { calcValueRatio } from './utils';
+import { calcPointRatio } from './utils';
 
 class GameUI extends Container {
     constructor(data) {
@@ -46,12 +46,7 @@ class GameUI extends Container {
             return;
         }
 
-        let { x: beforeX, y: beforeY } = before;
-        let { x: afterX, y: afterY } = after;
-
-        let x = calcValueRatio(beforeX, afterX, ratio);
-        let y = calcValueRatio(beforeY, afterY, ratio);
-
+        let { x, y } = calcPointRatio(before, after, ratio);
         this.position.set(x, y);
     }
 
