@@ -175,6 +175,11 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             this._components.push(character);
 
+            if (!data.name) return;
+
+            character.interactive = true;
+            character.buttonMode = true;
+
             let tooltip = new TextTooltip(data.name);
             tooltip.connect(character);
             tooltip.visible = false;
