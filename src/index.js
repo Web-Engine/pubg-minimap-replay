@@ -257,6 +257,11 @@ class Minimap extends PIXI.utils.EventEmitter {
         value = Number(value);
         if (isNaN(value)) return;
 
+        if (value < 0) value = 0;
+        else if (value > this.duration) value = this.duration;
+
+        if (this._currentTime === value) return;
+
         this._currentTime = value;
 
         if (!this.isPlaying) {
