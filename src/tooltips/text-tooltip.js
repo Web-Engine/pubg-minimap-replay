@@ -1,30 +1,22 @@
 import Tooltip from './tooltip';
-import TimeData from './../time-data';
 import { Text } from 'pixi.js'
 
 class TextTooltip extends Tooltip {
-    constructor(data) {
-        super(new Text('', {
+    constructor(text) {
+        super(new Text(text, {
             fill: 0xFFFFFF,
-            fontSize: 12,
+            fontSize: 14,
         }));
-
-        this._tooltips = new TimeData(data);
     }
 
-    update(elapsedTime) {
-        this._tooltips.seek(elapsedTime);
+    get text() {
+        return this._content.text;
+    }
 
-        let { before } = this._tooltips;
+    set text(value) {
+        if (this.text === value) return;
 
-        if (!before) {
-            this._content.text = '';
-            this.invalidate();
-            return;
-        }
-
-        this._content.text = before.text;
-
+        this._content.text = value;
         this.invalidate();
     }
 }

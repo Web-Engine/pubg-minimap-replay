@@ -5,6 +5,7 @@ import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
 import TextTooltip from './tooltips/text-tooltip';
+import TextTimeTooltip from './tooltips/text-time-tooltip';
 
 class Minimap extends PIXI.utils.EventEmitter {
     // region Constructor
@@ -131,7 +132,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             if (!data.tooltips || !data.tooltips.length) continue;
 
-            let tooltip = new TextTooltip(data.tooltips);
+            let tooltip = new TextTimeTooltip(data.tooltips);
             tooltip.connect(object);
             tooltip.visible = false;
 
@@ -174,35 +175,35 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             this._components.push(character);
 
-            // let tooltip = new TextTooltip('text');
-            // tooltip.connect(character);
-            // tooltip.visible = false;
-            //
-            // this._tooltipLayer.addChild(tooltip);
-            //
-            // let fix = false;
-            //
-            // character.on('mouseover', () => {
-            //     if (fix) return;
-            //
-            //     tooltip.visible = true;
-            //
-            //     if (this.isPlaying) return;
-            //     this._forceRender();
-            // });
-            //
-            // character.on('click', () => {
-            //     fix = !fix;
-            // });
-            //
-            // character.on('mouseout', () => {
-            //     if (fix) return;
-            //
-            //     tooltip.visible = false;
-            //
-            //     if (this.isPlaying) return;
-            //     this._forceRender();
-            // });
+            let tooltip = new TextTooltip(data.name);
+            tooltip.connect(character);
+            tooltip.visible = false;
+
+            this._tooltipLayer.addChild(tooltip);
+
+            let fix = false;
+
+            character.on('mouseover', () => {
+                if (fix) return;
+
+                tooltip.visible = true;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
+
+            character.on('click', () => {
+                fix = !fix;
+            });
+
+            character.on('mouseout', () => {
+                if (fix) return;
+
+                tooltip.visible = false;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
         }
     }
 
@@ -457,7 +458,6 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._forceRender();
         }
     }
-
     // endregion
 
     // region Public methods
@@ -472,7 +472,6 @@ class Minimap extends PIXI.utils.EventEmitter {
     stop() {
         this.isPlaying = false;
     }
-
     // endregion
 }
 
