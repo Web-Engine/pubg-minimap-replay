@@ -18,12 +18,14 @@ class Component extends Container {
         if (!before) {
             this.x = -Infinity;
             this.y = -Infinity;
+            this.emit('positionChange');
             return;
         }
 
         if (!after || !after.transition) {
             let { x, y } = this.toScaledPoint(before);
             this.position.set(x, y);
+            this.emit('positionChange');
             return;
         }
 
@@ -31,6 +33,7 @@ class Component extends Container {
         let { x, y } = this.toScaledPoint(location);
 
         this.position.set(x, y);
+        this.emit('positionChange');
     }
 
     toScaledPoint({ x, y } = {}) {

@@ -4,6 +4,8 @@ import GameCharacter from './game-character';
 import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
+import Tooltip from './tooltip';
+
 class Minimap extends PIXI.utils.EventEmitter {
     // region Constructor
     constructor(data) {
@@ -47,6 +49,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._zoom = 1;
         this._speed = 10;
         this._isPlaying = false;
+        this._components = [];
 
         this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
         this._center.on('change', () => {
@@ -96,10 +99,15 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     _initializeComponents() {
-        this._componentLayer = new PIXI.Container();
-        this._app.stage.addChild(this._componentLayer);
+        this._zoomLayer = new PIXI.Container();
+        this._app.stage.addChild(this._zoomLayer);
 
-        this._components = [];
+        this._componentLayer = new PIXI.Container();
+        this._zoomLayer.addChild(this._componentLayer);
+
+        this._tooltipLayer = new PIXI.Container();
+        this._zoomLayer.addChild(this._tooltipLayer);
+
         this._initializeBackground();
         this._initializeObjects();
         this._initializeCharacter();
@@ -128,6 +136,36 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._componentLayer.addChild(character);
 
             this._components.push(character);
+
+            let tooltip = new Tooltip();
+            tooltip.connect(character);
+            tooltip.visible = false;
+
+            this._tooltipLayer.addChild(tooltip);
+
+            let fix = false;
+
+            character.on('mouseover', () => {
+                if (fix) return;
+
+                tooltip.visible = true;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
+
+            character.on('click', () => {
+                fix = !fix;
+            });
+
+            character.on('mouseout', () => {
+                if (fix) return;
+
+                tooltip.visible = false;
+
+                if (this.isPlaying) return;
+                this._forceRender();
+            });
         }
     }
 
@@ -375,7 +413,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         let x = (this.center.x / this.gameWidth * this.zoom - 0.5) * this.width;
         let y = (this.center.y / this.gameWidth * this.zoom - 0.5) * this.height;
 
-        this._componentLayer.position.set(-x, -y);
+        this._zoomLayer.position.set(-x, -y);
 
         if (!this.isPlaying) {
             this._forceRender();
