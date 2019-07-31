@@ -1,10 +1,10 @@
 import * as PIXI from 'pixi.js';
-import GameObject from './game-object';
-import GameCharacter from './game-character';
+import GameObject from './components/game-object';
+import GameCharacter from './components/game-character';
 import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
-import Tooltip from './tooltip';
+import TextTooltip from './tooltips/text-tooltip';
 
 class Minimap extends PIXI.utils.EventEmitter {
     // region Constructor
@@ -137,7 +137,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
             this._components.push(character);
 
-            let tooltip = new Tooltip();
+            let tooltip = new TextTooltip('text');
             tooltip.connect(character);
             tooltip.visible = false;
 

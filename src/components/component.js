@@ -1,6 +1,6 @@
 import { Container } from 'pixi.js';
-import { calcPointRatio } from './utils';
-import TimeData from './time-data';
+import { calcPointRatio } from '../utils';
+import TimeData from '../time-data';
 
 class Component extends Container {
     constructor(minimap, locations) {

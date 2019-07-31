@@ -1,6 +1,6 @@
 import Component from './component';
-import TimeData from './time-data';
-import Shape from './shape';
+import TimeData from '../time-data';
+import Shape from '../shape';
 
 class ShapeComponent extends Component {
     constructor(minimap, locations, shapes) {
