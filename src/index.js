@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import GameObject from './components/game-object';
 import GameCharacter from './components/game-character';
+import GameAttack from './components/game-attack';
 import GameUI from './game-ui';
 import ObservablePoint from './observable/point';
 
@@ -51,6 +52,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._speed = 10;
         this._isPlaying = false;
         this._components = [];
+        this._attacks = [];
         this._tooltips = [];
 
         this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
@@ -106,6 +108,9 @@ class Minimap extends PIXI.utils.EventEmitter {
 
         this._componentLayer = new PIXI.Container();
         this._zoomLayer.addChild(this._componentLayer);
+
+        this._attackLayer = new PIXI.Container();
+        this._zoomLayer.addChild(this._attackLayer);
 
         this._tooltipLayer = new PIXI.Container();
         this._zoomLayer.addChild(this._tooltipLayer);
@@ -213,6 +218,12 @@ class Minimap extends PIXI.utils.EventEmitter {
     }
 
     _initializeAttacks() {
+        for (let data of this._data.attacks) {
+            let attack = new GameAttack(this, data);
+
+            this._attackLayer.addChild(attack);
+            this._attacks.push(attack);
+        }
     }
 
     _initializeUI() {
@@ -440,6 +451,7 @@ class Minimap extends PIXI.utils.EventEmitter {
     // region Private methods
     _update(elapsedTime) {
         this._components.forEach(component => component.update(elapsedTime));
+        this._attacks.forEach(component => component.update(elapsedTime));
         this._tooltips.forEach(tooltip => tooltip.update(elapsedTime));
         this._uis.forEach(ui => ui.update(elapsedTime));
     }

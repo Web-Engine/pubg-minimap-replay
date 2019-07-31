@@ -1,9 +1,12 @@
+function _calcRatio(before, after, time) {
+    if (before === after) return 0.5;
+    return (after - time) / (after - before);
+}
+
 function calcRatio(before, after, time) {
     if (!before || !after) return NaN;
-    if (before.elapsedTime === after.elapsedTime) return .5;
 
-    let difftime = after.elapsedTime - before.elapsedTime;
-    return (after.elapsedTime - time) / difftime;
+    return _calcRatio(before.elapsedTime, after.elapsedTime, time);
 }
 
 function calcValueRatio(a, b, ratio) {
@@ -57,4 +60,4 @@ function findCurrentState(array, time, left, right) {
 }
 
 
-export { calcRatio, calcValueRatio, calcPointRatio, findCurrentState };
+export { _calcRatio, calcRatio, calcValueRatio, calcPointRatio, findCurrentState };
