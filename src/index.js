@@ -27,9 +27,9 @@ class Minimap extends PIXI.utils.EventEmitter {
             this._initializeUI();
             this._initializeEvents();
             this._initializeTicker();
-            this._forceRender();
 
             this._isLoaded = true;
+            this._invalidate();
         });
     }
     // endregion
