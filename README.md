@@ -1,5 +1,4 @@
 # pubg-minimap-replay
-https://github.com/Web-Engine/pubg-minimap-replay
 이 레포지토리는 정해진 `포맷된 데이터`를 재생하는 라이브러리입니다.
 
 ## Data format
