@@ -56,7 +56,7 @@ class Minimap extends PIXI.utils.EventEmitter {
         this._components = [];
         this._attacks = [];
         this._tooltips = [];
-        this._isLoaded = true;
+        this._isLoaded = false;
 
         this._center = new ObservablePoint(this.gameWidth / 2, this.gameHeight / 2);
         this._center.on('change', () => {
