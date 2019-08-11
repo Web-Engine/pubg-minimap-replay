@@ -15,9 +15,7 @@ class Minimap extends PIXI.utils.EventEmitter {
 
         this._data = data;
 
-        this._initializeOptions();
         this._initializePIXI();
-
         this._initializeProperties();
 
         this._loadAssets(data);
@@ -35,14 +33,10 @@ class Minimap extends PIXI.utils.EventEmitter {
     // endregion
 
     // region Initializes
-    _initializeOptions() {
-
-    }
-
     _initializePIXI() {
         this._app = new PIXI.Application({
-            width: this._data.canvas.width,
-            height: this._data.canvas.height,
+            width: 800,
+            height: 800,
             antialias: true,
             autoStart: false,
         });

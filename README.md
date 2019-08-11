@@ -24,9 +24,6 @@
     
     // 게임의 전반적인 정보를 저장
     "game": GameInformation,
-    
-    // 리플레이를 재생할 캔버스 설정
-    "canvas": CanvasSettings,
 
     // 플레이어나 중립 몬스터등 살아있는 생명체를 표현
     "characters": [
@@ -94,19 +91,6 @@
 
     // 게임 총 진행 시간 (단위: ms)
     "duration": number
-}
-```
-
-### CanvasSettings
-리플레이를 재생하는 캔버스에 대한 설정입니다.
-
-```
-{
-    // 리플레이를 보여줄 캔버스의 가로 크기
-    "width": integer, 
-
-    // 리플레이를 보여줄 캔버스의 세로 크기
-    "height": integer
 }
 ```
 
