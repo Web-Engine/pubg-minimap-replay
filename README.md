@@ -21,7 +21,7 @@ html에서 bundle된 js파일을 불러옵니다.
 ### create minimap
 ```js
 let data = { Formatted Data };
-let minimap = new Replay.Minimap();
+let minimap = new Replay.Minimap(data);
 
 minimap.mount(document.body);
 ```
@@ -30,7 +30,7 @@ minimap.mount(document.body);
 ## Properties
 
 ### isPlaying
-현재 리플레이가 재생 중인 상태이면 true, 중지된 상태이면 false의 값을 가집니다.
+현재 리플레이가 재생 중인 상태이면 true, 중지된 상태이면 false의 값을 가집니다.  
 이 속성의 값을 변경하는 것으로 미니맵을 재생/중지 시킬 수 있습니다.
 
 ### currentTime
@@ -234,7 +234,7 @@ height 속성이 변경되면 호출되는 이벤트입니다.
 ```
 
 ### AssetList
-리플레이에 필요한 여러 이미지 에셋들을 담고 있습니다.
+리플레이에 필요한 여러 이미지 에셋들을 담고 있습니다.  
 이미지 에셋은 웹 경로나 base64로 인코딩된 이미지를 넣을 수 있습니다.
 
 ```js
@@ -298,7 +298,7 @@ height 속성이 변경되면 호출되는 이벤트입니다.
 ```
 
 ### GameObject
-미니맵에 표시되는 일반 객체입니다.
+미니맵에 표시되는 일반 객체입니다.  
 배틀그라운드의 레드존, 자기장(파란 원), 안전 지역(흰색 원), 보급상자 등을 표시할 때 활용 할 수 있습니다.
 
 ```js
@@ -330,7 +330,7 @@ height 속성이 변경되면 호출되는 이벤트입니다.
 ```
 
 ### GameUI
-미니맵에 표시할 UI를 정의합니다.
+미니맵에 표시할 UI를 정의합니다.  
 배틀 그라운드의 살아있는 사람 수, 혹은 리그오브레전드의 킬 스코어 현황 등을 표시할 때 활용 할 수 있습니다.
 
 ```js
