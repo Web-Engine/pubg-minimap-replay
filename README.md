@@ -1,6 +1,32 @@
 # pubg-minimap-replay
 이 레포지토리는 정해진 `포맷된 데이터`를 재생하는 라이브러리입니다.
 
+## npm
+아직 npm package로 배포되지 않았습니다.
+
+## How to use
+
+### build
+```bash
+$ npm run build
+```
+build를 실행하면 dist폴더에 bundle.js 파일이 생성됩니다.
+
+### load script
+```html
+<script src="bundle.js"></script>
+```
+html에서 bundle된 js파일을 불러옵니다.
+
+### create minimap
+```js
+let data = { Formatted Data };
+let minimap = new Replay.Minimap();
+
+minimap.mount(document.body);
+```
+위와 같이 `new Replay.Minimap(data)`로 미니맵을 생성할 수 있습니다.
+
 ## Properties
 
 ### isPlaying
@@ -39,7 +65,7 @@
 center 지점의 x값과 y값을 같이 변경할 수 있는 메소드입니다.
 
 ```js
-let minimap = new Replayer.Minimap(data);
+let minimap = new Replay.Minimap(data);
 minimap.center.set(minimap.gameWidth / 2, minimap.gameHeight / 2);
 ```
 
@@ -48,7 +74,7 @@ minimap.center.set(minimap.gameWidth / 2, minimap.gameHeight / 2);
 center 지점이 변경되면 호출되는 이벤트입니다.
 
 ```js
-let minimap = new Replayer.Minimap(data);
+let minimap = new Replay.Minimap(data);
 minimap.center.on('change', () => {
     console.log('center position changed');
 });
@@ -100,6 +126,7 @@ canvas에 그려지는 미니맵의 세로 크기입니다.
  
 ### canvas (readonly)
  * type: HTMLCanvasElement
+
 미니맵이 그려지는 `<canvas>` 요소입니다.
 
 ## Methods
@@ -120,7 +147,7 @@ isPlaying 속성이 false로 변경됩니다.
 
 ```js
 let data = { ... };
-let minimap = new Replayer.Minimap(data);
+let minimap = new Replay.Minimap(data);
 
 minimap.on('assetsLoaded', () => {
     // All texture loaded
