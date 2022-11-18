@@ -23,6 +23,6 @@
     "file-loader": "^4.1.0",
     "url-loader": "^2.0.1",
     "webpack": "^4.35.3",
-    "webpack-cli": "^3.3.6"
+    "webpack-cli": "^3.3.12"
   }
 }
